@@ -81,8 +81,11 @@ process.on("uncaughtException", (err) => {
 
 const PORT = process.env.PORT || 5500;
 
-server.listen(PORT, ()=>{
-    console.log(`Server is running on port ${PORT}`)
-    //  logger.info(`Server running on port ${PORT}`);
-})
+server.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+    // logger.info(`Server running on port ${PORT}`);
+});
+
+// ←←← ADD THIS ONE LINE BELOW (this is the magic fix for Vercel)
+module.exports = server;
 
