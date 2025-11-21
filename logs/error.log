@@ -1,0 +1,646 @@
+2025-07-24 11:32:31 | ERROR | TypeError: cb is not a function
+    at Ping.onOperationComplete (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Pool.js:110:5)
+    at Ping.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Ping._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Sequence.OkPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:92:8)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:88:28)
+2025-07-24 16:28:33 | ERROR | TypeError: cb is not a function
+    at Ping.onOperationComplete (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Pool.js:110:5)
+    at Ping.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Ping._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Sequence.OkPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:92:8)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:88:28)
+2025-07-24 16:30:14 | ERROR | TypeError: cb is not a function
+    at Ping.onOperationComplete (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Pool.js:110:5)
+    at Ping.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Ping._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Sequence.OkPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:92:8)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:88:28)
+2025-07-24 16:36:19 | ERROR | TypeError: cb is not a function
+    at Ping.onOperationComplete (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Pool.js:110:5)
+    at Ping.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Ping._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Sequence.OkPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:92:8)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:88:28)
+2025-07-24 16:38:35 | ERROR | TypeError: callback is not a function
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\models\bookingModel.js:344:16)
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+2025-07-24 16:38:52 | ERROR | TypeError: callback is not a function
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\models\bookingModel.js:344:16)
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+2025-07-24 18:12:54 | ERROR | TypeError: cb is not a function
+    at Ping.onOperationComplete (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Pool.js:110:5)
+    at Ping.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Ping._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Sequence.OkPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:92:8)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:88:28)
+2025-07-24 18:16:12 | ERROR | TypeError: cb is not a function
+    at Ping.onOperationComplete (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Pool.js:110:5)
+    at Ping.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Ping._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Sequence.OkPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:92:8)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:88:28)
+2025-07-24 18:20:04 | ERROR | TypeError: cb is not a function
+    at Ping.onOperationComplete (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Pool.js:110:5)
+    at Ping.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Ping._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Sequence.OkPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:92:8)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:88:28)
+2025-07-24 18:26:49 | ERROR | TypeError: cb is not a function
+    at Ping.onOperationComplete (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Pool.js:110:5)
+    at Ping.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Ping._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Sequence.OkPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:92:8)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:88:28)
+2025-07-24 18:31:54 | ERROR | TypeError: callback is not a function
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\models\bookingModel.js:543:7)
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.OkPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:74:10)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+2025-07-24 18:34:54 | ERROR | TypeError: callback is not a function
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\models\bookingModel.js:543:7)
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.OkPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:74:10)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+2025-07-24 21:19:12 | ERROR | TypeError: callback is not a function
+    at Query.<anonymous> (D:\React\callback\models\bookingModel.js:543:7)
+    at Query.<anonymous> (D:\React\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (D:\React\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (D:\React\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (D:\React\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.OkPacket (D:\React\callback\node_modules\mysql\lib\protocol\sequences\Query.js:74:10)
+    at Protocol._parsePacket (D:\React\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\React\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\React\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\React\callback\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+2025-07-25 15:06:09 | ERROR | ReferenceError: logger is not defined
+    at C:\Users\Admin\Pictures\callback\controllers\bookingController.js:483:23
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\models\bookingModel.js:606:18)
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.OkPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:74:10)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+2025-07-25 15:08:13 | ERROR | ReferenceError: getFormattedDate is not defined
+    at C:\Users\Admin\Pictures\callback\controllers\bookingController.js:564:92
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\models\bookingModel.js:606:18)
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.OkPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:74:10)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+2025-07-28 15:09:04 | ERROR | ReferenceError: sendMail is not defined
+    at C:\Users\Admin\Pictures\callback\controllers\helperController.js:445:9
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\models\helperModel.js:550:9)
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.OkPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:74:10)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+2025-07-28 15:48:53 | ERROR | TypeError: bookingModel.getAllCrmIds is not a function
+    at C:\Users\Admin\Pictures\callback\controllers\bookingController.js:930:20
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\models\bookingModel.js:688:7)
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.OkPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:74:10)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+2025-07-28 18:10:06 | ERROR | Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:659:11)
+    at ServerResponse.header (C:\Users\Admin\Pictures\callback\node_modules\express\lib\response.js:684:10)
+    at ServerResponse.send (C:\Users\Admin\Pictures\callback\node_modules\express\lib\response.js:161:12)
+    at ServerResponse.json (C:\Users\Admin\Pictures\callback\node_modules\express\lib\response.js:250:15)
+    at C:\Users\Admin\Pictures\callback\controllers\bookingController.js:1150:30
+    at C:\Users\Admin\Pictures\callback\models\bookingModel.js:683:21
+    at Handshake.onConnect (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Pool.js:58:9)
+    at Handshake.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Handshake._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+2025-07-28 18:16:27 | ERROR | Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:659:11)
+    at ServerResponse.header (C:\Users\Admin\Pictures\callback\node_modules\express\lib\response.js:684:10)
+    at ServerResponse.send (C:\Users\Admin\Pictures\callback\node_modules\express\lib\response.js:161:12)
+    at ServerResponse.json (C:\Users\Admin\Pictures\callback\node_modules\express\lib\response.js:250:15)
+    at C:\Users\Admin\Pictures\callback\controllers\bookingController.js:1150:46
+    at C:\Users\Admin\Pictures\callback\models\bookingModel.js:683:21
+    at Handshake.onConnect (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Pool.js:58:9)
+    at Handshake.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Handshake._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+2025-07-28 18:20:16 | ERROR | Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:659:11)
+    at ServerResponse.header (C:\Users\Admin\Pictures\callback\node_modules\express\lib\response.js:684:10)
+    at ServerResponse.send (C:\Users\Admin\Pictures\callback\node_modules\express\lib\response.js:161:12)
+    at ServerResponse.json (C:\Users\Admin\Pictures\callback\node_modules\express\lib\response.js:250:15)
+    at C:\Users\Admin\Pictures\callback\controllers\bookingController.js:1150:36
+    at C:\Users\Admin\Pictures\callback\models\bookingModel.js:683:21
+    at Handshake.onConnect (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Pool.js:58:9)
+    at Handshake.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Handshake._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+2025-07-28 18:22:11 | ERROR | Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:659:11)
+    at ServerResponse.header (C:\Users\Admin\Pictures\callback\node_modules\express\lib\response.js:684:10)
+    at ServerResponse.send (C:\Users\Admin\Pictures\callback\node_modules\express\lib\response.js:161:12)
+    at ServerResponse.json (C:\Users\Admin\Pictures\callback\node_modules\express\lib\response.js:250:15)
+    at C:\Users\Admin\Pictures\callback\controllers\bookingController.js:1150:36
+    at C:\Users\Admin\Pictures\callback\models\bookingModel.js:683:21
+    at Handshake.onConnect (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Pool.js:58:9)
+    at Handshake.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Handshake._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+2025-07-28 18:23:39 | ERROR | Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:659:11)
+    at ServerResponse.header (C:\Users\Admin\Pictures\callback\node_modules\express\lib\response.js:684:10)
+    at ServerResponse.send (C:\Users\Admin\Pictures\callback\node_modules\express\lib\response.js:161:12)
+    at ServerResponse.json (C:\Users\Admin\Pictures\callback\node_modules\express\lib\response.js:250:15)
+    at C:\Users\Admin\Pictures\callback\controllers\bookingController.js:1150:36
+    at C:\Users\Admin\Pictures\callback\models\bookingModel.js:683:21
+    at Handshake.onConnect (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Pool.js:58:9)
+    at Handshake.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Handshake._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+2025-07-28 20:55:32 | ERROR | Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:703:11)
+    at ServerResponse.header (D:\React\callback\node_modules\express\lib\response.js:684:10)
+    at ServerResponse.send (D:\React\callback\node_modules\express\lib\response.js:161:12)
+    at ServerResponse.json (D:\React\callback\node_modules\express\lib\response.js:250:15)
+    at D:\React\callback\controllers\bookingController.js:1150:36
+    at D:\React\callback\models\bookingModel.js:683:21
+    at Handshake.onConnect (D:\React\callback\node_modules\mysql\lib\Pool.js:58:9)
+    at Handshake.<anonymous> (D:\React\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Handshake._callback (D:\React\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (D:\React\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+2025-07-28 22:18:54 | ERROR | TypeError: Cannot read properties of undefined (reading 'adm_admin_name')
+    at D:\React\callback\controllers\bookingController.js:1271:87
+    at Query.<anonymous> (D:\React\callback\models\bookingModel.js:704:7)
+    at Query.<anonymous> (D:\React\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (D:\React\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (D:\React\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (D:\React\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.OkPacket (D:\React\callback\node_modules\mysql\lib\protocol\sequences\Query.js:74:10)
+    at Protocol._parsePacket (D:\React\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\React\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\React\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+2025-07-29 10:13:01 | ERROR | Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:659:11)
+    at ServerResponse.header (C:\Users\Admin\Pictures\callback\node_modules\express\lib\response.js:684:10)
+    at ServerResponse.send (C:\Users\Admin\Pictures\callback\node_modules\express\lib\response.js:161:12)
+    at ServerResponse.json (C:\Users\Admin\Pictures\callback\node_modules\express\lib\response.js:250:15)
+    at C:\Users\Admin\Pictures\callback\controllers\bookingController.js:1154:48
+    at C:\Users\Admin\Pictures\callback\models\bookingModel.js:699:21
+    at Handshake.onConnect (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Pool.js:58:9)
+    at Handshake.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Handshake._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+2025-07-29 10:31:12 | ERROR | Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:659:11)
+    at ServerResponse.header (C:\Users\Admin\Pictures\callback\node_modules\express\lib\response.js:684:10)
+    at ServerResponse.send (C:\Users\Admin\Pictures\callback\node_modules\express\lib\response.js:161:12)
+    at ServerResponse.json (C:\Users\Admin\Pictures\callback\node_modules\express\lib\response.js:250:15)
+    at C:\Users\Admin\Pictures\callback\controllers\bookingController.js:1183:38
+    at C:\Users\Admin\Pictures\callback\models\bookingModel.js:699:21
+    at Handshake.onConnect (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Pool.js:58:9)
+    at Handshake.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Handshake._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+2025-07-29 10:36:18 | ERROR | ReferenceError: id is not defined
+    at C:\Users\Admin\Pictures\callback\models\bookingModel.js:700:52
+    at Handshake.onConnect (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Pool.js:58:9)
+    at Handshake.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Handshake._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Handshake.ErrorPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Handshake.js:125:8)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+2025-07-29 10:45:19 | ERROR | TypeError: Cannot read properties of undefined (reading 'toISOString')
+    at C:\Users\Admin\Pictures\callback\controllers\bookingController.js:1058:42
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\models\bookingModel.js:1028:7)
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+2025-07-29 11:08:13 | ERROR | TypeError: mailSending.sendMail is not a function
+    at C:\Users\Admin\Pictures\callback\controllers\bookingController.js:1169:17
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\models\helperModel.js:535:9)
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+2025-07-29 11:09:26 | ERROR | TypeError: mailSending.sendPostmarkMail is not a function
+    at C:\Users\Admin\Pictures\callback\controllers\bookingController.js:1169:17
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\models\helperModel.js:535:9)
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+2025-07-29 11:11:27 | ERROR | TypeError: mailSending.sendPostmarkMail is not a function
+    at C:\Users\Admin\Pictures\callback\controllers\bookingController.js:1168:13
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\models\helperModel.js:535:9)
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+2025-07-29 16:20:45 | ERROR | TypeError: Cannot read properties of undefined (reading 'release')
+    at Object.updateExternalCallsStatus (C:\Users\Admin\Pictures\callback\models\bookingModel.js:1368:18)
+    at C:\Users\Admin\Pictures\callback\controllers\bookingController.js:1678:22
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\models\bookingModel.js:708:7)
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.OkPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:74:10)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+2025-07-29 21:23:14 | ERROR | Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:703:11)
+    at ServerResponse.header (D:\React\callback\node_modules\express\lib\response.js:684:10)
+    at ServerResponse.send (D:\React\callback\node_modules\express\lib\response.js:161:12)
+    at ServerResponse.json (D:\React\callback\node_modules\express\lib\response.js:250:15)
+    at D:\React\callback\controllers\bookingController.js:2046:28
+    at Query.<anonymous> (D:\React\callback\models\bookingModel.js:1443:14)
+    at Query.<anonymous> (D:\React\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (D:\React\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (D:\React\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (D:\React\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+2025-07-31 14:42:41 | ERROR | Unhandled Rejection at:
+2025-07-31 14:42:41 | ERROR | Unhandled Rejection at:
+2025-07-31 14:43:17 | ERROR | Unhandled Rejection at:
+2025-07-31 14:43:17 | ERROR | Unhandled Rejection at:
+2025-07-31 14:45:41 | ERROR | Unhandled Rejection at:
+2025-07-31 14:50:03 | ERROR | Unhandled Rejection at:
+2025-07-31 14:52:43 | ERROR | Unhandled Rejection at:
+2025-07-31 14:52:43 | ERROR | Unhandled Rejection at:
+2025-07-31 14:53:26 | ERROR | Unhandled Rejection at:
+2025-07-31 14:53:36 | ERROR | Unhandled Rejection at:
+2025-07-31 14:53:36 | ERROR | Unhandled Rejection at:
+2025-07-31 14:53:38 | ERROR | Unhandled Rejection at:
+2025-07-31 14:58:18 | ERROR | ReferenceError: moment is not defined
+    at C:\Users\Admin\Pictures\callback\controllers\helperController.js:522:27
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\models\bookingModel.js:1042:7)
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+2025-08-06 13:37:14 | ERROR | TypeError: Cannot read properties of undefined (reading 'fld_name')
+    at C:\Users\Admin\Pictures\callback\controllers\bookingController.js:1108:30
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\models\bookingModel.js:708:7)
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.OkPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:74:10)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+2025-08-06 16:31:40 | ERROR | Unhandled Rejection at:
+2025-08-08 13:12:41 | ERROR | ReferenceError: res is not defined
+    at C:\Users\Admin\Pictures\callback\models\helperModel.js:768:7
+    at Handshake.onConnect (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Pool.js:64:7)
+    at Handshake.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Handshake._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Sequence.OkPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:92:8)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+2025-08-08 17:44:42 | ERROR | ReferenceError: onlineUsers is not defined
+    at Socket.<anonymous> (C:\Users\Admin\Pictures\callback\index.js:61:52)
+    at Socket.emit (node:events:519:28)
+    at Socket.emitReserved (C:\Users\Admin\Pictures\callback\node_modules\socket.io\dist\typed-events.js:56:22)
+    at Socket._onclose (C:\Users\Admin\Pictures\callback\node_modules\socket.io\dist\socket.js:554:14)
+    at Client.onclose (C:\Users\Admin\Pictures\callback\node_modules\socket.io\dist\client.js:247:20)
+    at Socket.emit (node:events:531:35)
+    at Socket.onClose (C:\Users\Admin\Pictures\callback\node_modules\engine.io\build\socket.js:320:18)
+    at Object.onceWrapper (node:events:633:28)
+    at WebSocket.emit (node:events:519:28)
+    at WebSocket.onClose (C:\Users\Admin\Pictures\callback\node_modules\engine.io\build\transport.js:114:14)
+2025-08-10 20:36:08 | ERROR | ReferenceError: getIO is not defined
+    at D:\React\callback\controllers\helperController.js:137:18
+    at Query.<anonymous> (D:\React\callback\models\helperModel.js:103:9)
+    at Query.<anonymous> (D:\React\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (D:\React\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (D:\React\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (D:\React\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (D:\React\callback\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (D:\React\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\React\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\React\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+2025-08-10 22:11:54 | ERROR | ReferenceError: getConnectedUsers is not defined
+    at D:\React\callback\controllers\helperController.js:494:32
+    at Query.<anonymous> (D:\React\callback\models\helperModel.js:648:9)
+    at Query.<anonymous> (D:\React\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (D:\React\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (D:\React\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (D:\React\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.OkPacket (D:\React\callback\node_modules\mysql\lib\protocol\sequences\Query.js:74:10)
+    at Protocol._parsePacket (D:\React\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\React\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\React\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+2025-08-11 10:21:04 | ERROR | ReferenceError: getIO is not defined
+    at C:\Users\Admin\Pictures\callback\controllers\bookingController.js:1111:18
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\models\bookingModel.js:1074:7)
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.OkPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:74:10)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+2025-08-11 10:58:20 | ERROR | ReferenceError: bookingid is not defined
+    at C:\Users\Admin\Pictures\callback\controllers\bookingController.js:616:48
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\models\bookingModel.js:689:18)
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.OkPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:74:10)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+2025-08-12 16:57:09 | ERROR | TypeError: Cannot set properties of undefined (setting 'otp_code')
+    at C:\Users\Admin\Pictures\callback\controllers\helperController.js:989:26
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\models\bookingModel.js:1969:7)
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+2025-08-14 16:26:38 | ERROR | ReferenceError: consultantId is not defined
+    at C:\Users\Admin\Pictures\callback\controllers\bookingController.js:581:25
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\models\bookingModel.js:727:18)
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.OkPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:74:10)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+2025-08-14 17:18:50 | ERROR | ReferenceError: NULL is not defined
+    at C:\Users\Admin\Pictures\callback\controllers\bookingController.js:2201:33
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\models\bookingModel.js:1119:7)
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+2025-08-18 09:39:14 | ERROR | ReferenceError: comment1 is not defined
+    at C:\Users\Admin\Pictures\callback\controllers\bookingController.js:607:42
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\models\bookingModel.js:966:9)
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+2025-08-18 09:44:37 | ERROR | ReferenceError: today is not defined
+    at C:\Users\Admin\Pictures\callback\models\bookingModel.js:249:53
+    at Ping.onOperationComplete (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Pool.js:110:5)
+    at Ping.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Ping._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Sequence.OkPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:92:8)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+2025-08-18 14:42:32 | ERROR | ReferenceError: getIO is not defined
+    at C:\Users\Admin\Pictures\callback\controllers\cronController.js:410:18
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\models\bookingModel.js:1131:7)
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+2025-08-18 14:47:59 | ERROR | ReferenceError: sendPostmarkMail is not defined
+    at C:\Users\Admin\Pictures\callback\controllers\cronController.js:320:11
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\models\bookingModel.js:954:9)
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+2025-08-18 18:38:15 | ERROR | ReferenceError: consultantId is not defined
+    at C:\Users\Admin\Pictures\callback\models\bookingModel.js:302:13
+    at Handshake.onConnect (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Pool.js:64:7)
+    at Handshake.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Handshake._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Sequence.OkPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:92:8)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+2025-08-19 12:28:27 | ERROR | ReferenceError: bookingId is not defined
+    at C:\Users\Admin\Pictures\callback\controllers\helperController.js:1121:27
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\models\bookingModel.js:850:7)
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.OkPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:74:10)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+2025-08-19 12:31:06 | ERROR | Unhandled Rejection at:
+2025-08-21 10:42:16 | ERROR | ReferenceError: phone is not defined
+    at C:\Users\Admin\Pictures\callback\controllers\userController.js:175:9
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\models\userModel.js:35:14)
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+2025-08-21 11:10:51 | ERROR | TypeError: callback is not a function
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\models\bookingModel.js:2094:18)
+    at Query.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+2025-08-21 11:12:42 | ERROR | TypeError: Cannot read properties of null (reading 'consultationStatus')
+    at buildFilters (C:\Users\Admin\Pictures\callback\models\bookingModel.js:1857:15)
+    at executeQuery (C:\Users\Admin\Pictures\callback\models\bookingModel.js:2045:5)
+    at handleUserTypeAccess (C:\Users\Admin\Pictures\callback\models\bookingModel.js:2104:7)
+    at C:\Users\Admin\Pictures\callback\models\bookingModel.js:2219:5
+    at Ping.onOperationComplete (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Pool.js:110:5)
+    at Ping.<anonymous> (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Ping._callback (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Sequence.OkPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:92:8)
+    at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+2025-09-23 16:15:04 | ERROR | Unhandled Rejection at:
+2025-09-23 16:17:04 | ERROR | Unhandled Rejection at:
+2025-09-29 21:12:52 | ERROR | Unhandled Rejection at:
+2025-09-29 21:30:21 | ERROR | Unhandled Rejection at:
+2025-09-29 21:35:16 | ERROR | Unhandled Rejection at:
+2025-09-29 21:42:35 | ERROR | Unhandled Rejection at:
+2025-09-29 21:49:21 | ERROR | Unhandled Rejection at:
+2025-09-29 22:12:12 | ERROR | Unhandled Rejection at:
+2025-09-29 22:37:03 | ERROR | Unhandled Rejection at:
+2025-09-30 11:31:58 | ERROR | Unhandled Rejection at:
+2025-09-30 11:32:35 | ERROR | Unhandled Rejection at:
+2025-09-30 11:35:21 | ERROR | Unhandled Rejection at:
+2025-09-30 13:04:59 | ERROR | Unhandled Rejection at:
+2025-09-30 13:11:25 | ERROR | Unhandled Rejection at:
+2025-10-01 11:01:22 | ERROR | Unhandled Rejection at:
+2025-10-01 11:02:43 | ERROR | Unhandled Rejection at:
+2025-10-01 11:04:47 | ERROR | Unhandled Rejection at:
+2025-10-01 16:45:43 | ERROR | Unhandled Rejection at:
+2025-10-01 16:49:20 | ERROR | Unhandled Rejection at:
+2025-10-03 10:48:51 | ERROR | Unhandled Rejection at:
+2025-10-03 10:49:45 | ERROR | Unhandled Rejection at:
+2025-10-06 13:32:50 | ERROR | Unhandled Rejection at:
+2025-10-06 13:38:12 | ERROR | Unhandled Rejection at:
+2025-10-06 13:38:56 | ERROR | Unhandled Rejection at:
+2025-10-06 13:46:08 | ERROR | Unhandled Rejection at:
+2025-10-06 14:42:27 | ERROR | Unhandled Rejection at:
+2025-10-06 14:44:53 | ERROR | Unhandled Rejection at:
+2025-10-06 14:49:21 | ERROR | Unhandled Rejection at:
+2025-10-06 14:49:53 | ERROR | Unhandled Rejection at:
+2025-10-06 14:52:04 | ERROR | Unhandled Rejection at:
+2025-10-23 12:27:48 | ERROR | Unhandled Rejection at:
+2025-10-23 12:28:53 | ERROR | Unhandled Rejection at:
+2025-10-23 12:48:48 | ERROR | Unhandled Rejection at:
+2025-10-23 12:48:49 | ERROR | Unhandled Rejection at:
+2025-10-27 16:30:26 | ERROR | TypeError: helperModel.getAddCallRequestById is not a function
+    at emitAddCallRequestAdded (C:\Users\Saravanan\Pictures\react\callback\controllers\bookingController.js:3546:15)
+    at C:\Users\Saravanan\Pictures\react\callback\controllers\bookingController.js:546:25
+    at Query.<anonymous> (C:\Users\Saravanan\Pictures\react\callback\models\bookingModel.js:1069:9)
+    at Query.<anonymous> (C:\Users\Saravanan\Pictures\react\callback\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (C:\Users\Saravanan\Pictures\react\callback\node_modules\mysql\lib\Connection.js:488:16)
+    at Sequence.end (C:\Users\Saravanan\Pictures\react\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (C:\Users\Saravanan\Pictures\react\callback\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.OkPacket (C:\Users\Saravanan\Pictures\react\callback\node_modules\mysql\lib\protocol\sequences\Query.js:74:10)
+    at Protocol._parsePacket (C:\Users\Saravanan\Pictures\react\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (C:\Users\Saravanan\Pictures\react\callback\node_modules\mysql\lib\protocol\Parser.js:433:10)
+2025-11-05 12:46:18 | ERROR | Unhandled Rejection at:
+2025-11-05 12:48:36 | ERROR | Unhandled Rejection at:
+2025-11-05 12:48:50 | ERROR | Unhandled Rejection at:
+2025-11-05 12:49:04 | ERROR | Unhandled Rejection at:

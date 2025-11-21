@@ -1,0 +1,2844 @@
+const db = require("../config/db");
+const instacrm_db = require("../config/instacrm_db");
+// const rc_db = require("../config/rc_db");
+const moment = require("moment-timezone");
+const { promisify } = require('util');
+
+const axios = require("axios");
+
+function getCurrentDate(format = "YYYY-MM-DD") {
+  return moment().tz("Asia/Kolkata").format(format);
+}
+
+function getDateBefore(days = 0, format = "YYYY-MM-DD") {
+  return moment().tz("Asia/Kolkata").subtract(days, "days").format(format);
+}
+
+const getBookings = (
+  userId,
+  userType,
+  subadminType,
+  assigned_team,
+  filters,
+  dashboard_status,
+  callback
+) => {
+  const currentDate = moment().tz("Asia/Kolkata");
+  const twoDaysBefore = currentDate
+    .clone()
+    .subtract(2, "days")
+    .format("YYYY-MM-DD");
+  const twoDaysAfter = currentDate.clone().add(2, "days").format("YYYY-MM-DD");
+
+  let sql = `
+    SELECT 
+      b.*,
+      b.id AS booking_id,
+      consultant.fld_name AS consultant_name,
+      consultant.fld_email AS consultant_email,
+      crm.fld_name AS crm_name,
+      crm.fld_email AS crm_email,
+      user.fld_name AS client_name,
+      user.fld_email AS client_email,
+      user.fld_phone AS client_phone,
+      user.fld_city,
+      user.fld_country
+    FROM tbl_booking b
+    LEFT JOIN tbl_admin consultant ON b.fld_consultantid = consultant.id
+    LEFT JOIN tbl_admin crm ON b.fld_addedby = crm.id
+    LEFT JOIN tbl_user user ON b.fld_userid = user.id
+    WHERE b.callDisabled IS NULL
+    AND b.fld_call_related_to != 'I_am_not_sure'
+  `;
+
+  const params = [];
+
+  // -------------------------
+  // Build Filters
+  // -------------------------
+  const buildFilters = () => {
+    if (
+      Array.isArray(filters.consultationStatus) &&
+      filters.consultationStatus.length > 0
+    ) {
+      const placeholders = filters.consultationStatus.map(() => "?").join(",");
+      sql += ` AND b.fld_call_request_sts IN (${placeholders})`;
+      params.push(...filters.consultationStatus);
+    } else if (filters.consultationStatus) {
+      sql += ` AND b.fld_call_request_sts = ?`;
+      params.push(filters.consultationStatus);
+    }
+
+    if (filters.recordingStatus) {
+      sql += ` AND b.callRecordingSts = ?`;
+      params.push(filters.recordingStatus);
+    }
+
+    if (filters.sale_type) {
+      sql += ` AND b.fld_sale_type = ?`;
+      params.push(filters.sale_type);
+    }
+
+    if (filters.consultantId) {
+      sql += ` AND b.fld_consultantid = ?`;
+      params.push(filters.consultantId);
+    }
+
+    if (filters.crmId) {
+      sql += ` AND b.fld_addedby = ?`;
+      params.push(filters.crmId);
+    }
+
+    if (filters.search) {
+      sql += ` AND (b.fld_name LIKE ? OR b.fld_email LIKE ?)`;
+      params.push(`%${filters.search}%`, `%${filters.search}%`);
+    }
+
+    if (filters.fromDate && filters.toDate) {
+      const today = getCurrentDate();
+      const last7DaysStart = getDateBefore(7);
+
+      if (
+        userType === "EXECUTIVE" &&
+        filters.filter_type === "Booking" &&
+        filters.fromDate === last7DaysStart &&
+        filters.toDate === today
+      ) {
+        // For executive: last 7 days booking date + today's created rows
+
+        sql += ` AND (
+               DATE(b.fld_booking_date) BETWEEN ? AND ?
+               OR DATE(b.fld_addedon) = ?
+               OR DATE(b.fld_booking_date) > ?
+             )`;
+        params.push(filters.fromDate, filters.toDate, today, today);
+      } else if (
+        userType === "CONSULTANT" &&
+        filters.filter_type === "Booking" &&
+        filters.fromDate === last7DaysStart &&
+        filters.toDate === today
+      ) {
+        // For executive: last 7 days booking date + today's created rows
+
+        sql += ` AND (
+               DATE(b.fld_booking_date) BETWEEN ? AND ?
+               
+               OR DATE(b.fld_booking_date) > ?
+             )`;
+        params.push(filters.fromDate, filters.toDate, today);
+      } else {
+        // Normal filter
+        const dateField =
+          filters.filter_type === "Created"
+            ? "b.fld_addedon"
+            : "b.fld_booking_date";
+        sql += ` AND DATE(${dateField}) BETWEEN ? AND ?`;
+        params.push(filters.fromDate, filters.toDate);
+      }
+    } else if (filters.fromDate) {
+      const dateField =
+        filters.filter_type === "Created"
+          ? "b.fld_addedon"
+          : "b.fld_booking_date";
+      sql += ` AND DATE(${dateField}) >= ?`;
+      params.push(filters.fromDate);
+    } else if (filters.toDate) {
+      const dateField =
+        filters.filter_type === "Created"
+          ? "b.fld_addedon"
+          : "b.fld_booking_date";
+      sql += ` AND DATE(${dateField}) <= ?`;
+      params.push(filters.toDate);
+    }
+    const today = moment().tz("Asia/Kolkata").format("YYYY-MM-DD");
+    if (dashboard_status) {
+      sql += ` AND b.fld_call_request_sts = ?`;
+      params.push(dashboard_status);
+      sql += ` AND b.fld_consultation_sts = ?`;
+      params.push(dashboard_status);
+      sql += ` AND b.fld_booking_date = ?`;
+      params.push(today);
+    }
+  };
+
+  // -------------------------
+  // ORDER BY logic
+  // -------------------------
+  const getOrderByClause = () => {
+    let orderBy = `
+      ORDER BY 
+        CASE 
+          WHEN DATE(b.fld_booking_date) = CURDATE() THEN 1 
+          WHEN DATE(b.fld_booking_date) > CURDATE() THEN 2 
+          ELSE 3 
+        END ASC,
+        CASE 
+          WHEN DATE(b.fld_booking_date) < CURDATE() THEN b.fld_booking_date 
+        END DESC,
+        b.fld_booking_date ASC
+      LIMIT 500
+    `;
+
+    // EXECUTIVE + last 7 days → prioritize today's addedon
+    if (userType === "EXECUTIVE" && filters.fromDate && filters.toDate) {
+      const today = getCurrentDate();
+      const last7DaysStart = getDateBefore(7);
+      if (filters.fromDate === last7DaysStart && filters.toDate === today) {
+        orderBy = `
+          ORDER BY
+            CASE 
+              WHEN DATE(b.fld_addedon) = CURDATE() THEN 1
+              ELSE 2
+            END ASC,
+            b.fld_addedon DESC,
+            CASE 
+              WHEN DATE(b.fld_booking_date) = CURDATE() THEN 1 
+              WHEN DATE(b.fld_booking_date) > CURDATE() THEN 2 
+              ELSE 3 
+            END ASC,
+            CASE 
+              WHEN DATE(b.fld_booking_date) < CURDATE() THEN b.fld_booking_date
+            END DESC,
+            b.fld_booking_date ASC
+          LIMIT 500
+        `;
+      }
+    }
+
+    return orderBy;
+  };
+
+  // -------------------------
+  // Execute query
+  // -------------------------
+  const executeQuery = () => {
+    buildFilters();
+    sql += getOrderByClause();
+
+    db.query(sql, params, (err, results) => {
+      
+      if (err) return callback(err);
+      callback(null, results);
+    });
+  };
+
+  // -------------------------
+  // Role Handling
+  // -------------------------
+  
+
+    if (userType === "SUPERADMIN") {
+      executeQuery();
+
+
+    }
+    //for subadmin fetching bookingbased on teams
+    else if (userType === "SUBADMIN" && assigned_team) {
+      const teamIds = assigned_team
+        .split(",")
+        .map((id) => id.trim())
+        .filter(Boolean);
+
+      if (subadminType === "consultant_sub") {
+        // Only fetch bookings for consultants in assigned teams
+        if (teamIds.length > 0) {
+          const placeholders = teamIds
+            .map(() => "FIND_IN_SET(?, a.fld_team_id)")
+            .join(" OR ");
+          const adminQuery = `SELECT id FROM tbl_admin a WHERE ${placeholders}`;
+
+          db.query(adminQuery, teamIds, (err, adminRows) => {
+            if (err) {
+              return callback(err);
+            }
+
+            const consultantIds = adminRows.map((row) => row.id);
+            if (consultantIds.length === 0) {
+             
+              return callback(null, []);
+            }
+
+            const uidPlaceholders = consultantIds.map(() => "?").join(",");
+            sql += ` AND b.fld_consultantid IN (${uidPlaceholders})`;
+            params.push(...consultantIds);
+
+            executeQuery();
+          });
+        } else {
+          sql += ` AND b.fld_consultantid = ?`;
+          params.push(userId);
+          executeQuery();
+        }
+      } else {
+        // Other SUBADMINs: fetch bookings added by them or their team members
+        if (teamIds.length > 0) {
+          const placeholders = teamIds
+            .map(() => "FIND_IN_SET(?, a.fld_team_id)")
+            .join(" OR ");
+          const adminQuery = `SELECT id FROM tbl_admin a WHERE ${placeholders}`;
+
+          db.query(adminQuery, teamIds, (err, adminRows) => {
+            if (err) {
+              return callback(err);
+            }
+
+            const adminIds = adminRows.map((row) => row.id);
+            const uniqueUserIds = [...new Set([...adminIds, userId])];
+
+            if (uniqueUserIds.length === 0) {
+              return callback(null, []);
+            }
+
+            const uidPlaceholders = uniqueUserIds.map(() => "?").join(",");
+            sql += ` AND (b.fld_consultantid IN (${uidPlaceholders}) OR b.fld_addedby IN (${uidPlaceholders}))`;
+            params.push(...uniqueUserIds, ...uniqueUserIds);
+
+            executeQuery();
+          });
+        } else {
+          sql += ` AND (b.fld_consultantid = ? OR b.fld_addedby = ?)`;
+          params.push(userId, userId);
+          executeQuery();
+        }
+      }
+    } 
+    ///for consultant skip consultant assigned and postponed(ie, not booking scheduled)
+    else if (userType === "CONSULTANT") {
+      sql += ` AND b.fld_consultantid = ? AND b.fld_call_request_sts NOT IN (?, ?)`;
+      params.push(userId, "Consultant Assigned", "Postponed");
+
+      executeQuery();
+    } else if (userType === "EXECUTIVE") {
+      sql += ` AND b.fld_addedby = ?`;
+      params.push(userId);
+      executeQuery();
+    } else {
+      sql += ` AND 1 = 0`; // fallback - no access
+      executeQuery();
+    }
+  
+};
+
+const getBookingHistory = (bookingId, callback) => {
+  const sql = `
+    SELECT 
+      id,
+      fld_booking_id,
+      fld_comment,
+      fld_rescheduled_date_time,
+      fld_addedon,
+      fld_notif_view_sts,
+      fld_notif_for,
+      fld_notif_for_id,
+      view_sts,
+      crmIdsNotifi
+    FROM tbl_booking_overall_history
+    WHERE fld_booking_id = ?
+    ORDER BY id DESC
+  `;
+
+
+    db.query(sql, [bookingId], (queryErr, results) => {
+   
+      if (queryErr) return callback(queryErr);
+      return callback(null, results);
+    });
+  
+};
+
+// Get Presales client details from InstaCRM
+const getPresaleClientDetails = (client_id, callback) => {
+ 
+
+    const queryAssignSQL = `
+      SELECT 
+        aq.query_id,
+        w.website AS insta_website,
+        c.company_name
+      FROM tbl_assign_query aq
+      LEFT JOIN tbl_website w ON aq.website_id = w.id
+      LEFT JOIN tbl_company c ON aq.company_id = c.id
+      WHERE aq.id = ?
+      LIMIT 1
+    `;
+
+    instacrm_db.query(queryAssignSQL, [client_id], (err, assignResult) => {
+      if (err) {
+        return callback(err);
+      }
+
+      if (!assignResult || assignResult.length === 0) {
+        
+        return callback(null, null);
+      }
+
+      const { query_id, insta_website, company_name } = assignResult[0];
+
+      const queryDetailsSQL = `
+        SELECT 
+          name,
+          email_id AS email,
+          alt_email_id,
+          phone
+        FROM tbl_query 
+        WHERE id = ? 
+        LIMIT 1
+      `;
+
+      instacrm_db.query(queryDetailsSQL, [query_id], (err2, queryResult) => {
+        
+
+        if (err2) return callback(err2);
+        if (!queryResult || queryResult.length === 0)
+          return callback(null, null);
+
+        const queryData = queryResult[0];
+        queryData.insta_website = insta_website || null;
+        queryData.assigned_company = company_name || null;
+
+        return callback(null, queryData);
+      });
+    });
+  
+};
+
+// const getPostsaleClientDetails = (client_id, callback) => {
+//   rc_db.getConnection((err, connection) => {
+//     if (err) return callback(err);
+
+//     const studentSQL = `
+//       SELECT
+//         st_id,
+//         st_name AS name,
+//         st_email AS email,
+//         contact_no AS phone,
+//         address1
+//       FROM tbl_scholar
+//       WHERE student_code = ?
+//       LIMIT 1
+//     `;
+
+//     connection.query(studentSQL, [client_id], (err, studentResult) => {
+//       if (err) {
+//         connection.release();
+//         return callback(err);
+//       }
+
+//       if (!studentResult || studentResult.length === 0) {
+//         connection.release();
+//         return callback(null, null);
+//       }
+
+//       const student = studentResult[0];
+//       const st_id = student.st_id;
+
+//       const projectSQL = `SELECT id, project_title FROM tbl_project WHERE student_id = ?`;
+
+//       connection.query(projectSQL, [st_id], (err2, projectResults) => {
+//         if (err2) {
+//           connection.release();
+//           return callback(err2);
+//         }
+
+//         const planSQL = `
+//           SELECT plan_type
+//           FROM tbl_clients_plan_upgrade
+//           WHERE client_id = ? AND status = 2
+//           ORDER BY id DESC
+//           LIMIT 1
+//         `;
+
+//         connection.query(planSQL, [st_id], (err3, planResult) => {
+//           connection.release();
+
+//           if (err3) return callback(err3);
+
+//           const plan_type = (planResult && planResult.length > 0) ? planResult[0].plan_type : null;
+
+//           const response = {
+//             name: student.name,
+//             email: student.email,
+//             phone: student.phone,
+//             projects: projectResults || [],
+//             plan_type: plan_type,
+//           };
+
+//           return callback(null, response);
+//         });
+//       });
+//     });
+//   });
+// };
+
+// const getProjectMilestones = (projectId, callback) => {
+//   const sql = `
+//     SELECT id, segment_title
+//     FROM tbl_segment
+//     WHERE project_id = ?
+//     ORDER BY segment_date ASC
+//   `;
+
+//   rc_db.getConnection((err, connection) => {
+//     if (err) return callback(err);
+
+//     connection.query(sql, [projectId], (queryErr, results) => {
+//       connection.release();
+//       if (queryErr) return callback(queryErr);
+//       return callback(null, results);
+//     });
+//   });
+// };
+
+const checkCallrecording = (email, ref_id, callback) => {
+  const sql = `
+    SELECT * FROM tbl_booking 
+    WHERE fld_email = ? 
+      AND fld_client_id = ? 
+      AND fld_call_request_sts = 'Completed' 
+      AND callRecordingSts = 'Call Recording Pending' 
+      AND fld_addedon > '2025-06-06 00:00:00'
+  `;
+
+    db.query(
+      sql,
+      [email.trim(), ref_id.trim()],
+      (queryErr, results) => {
+        if (queryErr) return callback(queryErr);
+        return callback(null, results);
+      }
+    );
+  
+};
+
+const checkConsultantClientWebsite = (
+  consultantid,
+  email,
+  insta_website,
+  callback
+) => {
+  const sql = `
+    SELECT * FROM tbl_booking 
+    WHERE fld_email = ? 
+      AND fld_consultantid = ? 
+      AND fld_sale_type = ? 
+      AND fld_insta_website IS NOT NULL 
+    ORDER BY id DESC 
+    LIMIT 1
+  `;
+
+  
+
+    db.query(
+      sql,
+      [email, consultantid, "Presales"],
+      (queryErr, results) => {
+
+        if (queryErr) {
+          console.error("Query error:", queryErr);
+          return callback(queryErr, null);
+        }
+
+        if (results.length > 0) {
+          return callback(null, results[0]);
+        } else {
+          return callback(null, null);
+        }
+      }
+    );
+  
+};
+
+const checkConsultantCompletedCall = (
+  consultantId,
+  clientEmail,
+  saleType,
+  loginCrmId,
+  callback
+) => {
+  
+
+    const sql = `
+      SELECT * FROM tbl_booking 
+      WHERE fld_consultantid = ? 
+        AND fld_email = ? 
+        AND fld_consultation_sts = 'Completed' 
+        AND fld_call_request_sts = 'Completed' 
+        AND fld_sale_type = ? 
+      ORDER BY id DESC LIMIT 1
+    `;
+
+    db.query(sql, [consultantId, clientEmail, saleType], (err, results) => {
+      if (err) {
+        return callback(err);
+      }
+
+      if (results.length === 0) {
+        return callback(null, "call not completed");
+      }
+
+      const result1 = results[0];
+      const bookingId = result1.id;
+      const bookingTeamIds = result1.fld_teamid
+        .split(",")
+        .map((id) => id.trim()); // booking teams as array
+
+      const adminSql = `SELECT fld_team_id FROM tbl_admin WHERE id = ?`;
+
+      db.query(adminSql, [loginCrmId], (err, adminResults) => {
+        if (err) {
+          return callback(err);
+        }
+
+        const loginTeamIds = adminResults[0]?.fld_team_id
+          .split(",")
+          .map((id) => id.trim()); // user teams as array
+
+        // Check if any booking team matches any CRM team
+        const isTeamMatch = bookingTeamIds.some((id) => loginTeamIds.includes(id));
+
+        if (isTeamMatch) {
+          return callback(null, "add call");
+        }
+
+        const historySql = `
+          SELECT fld_call_completed_date FROM tbl_booking_sts_history 
+          WHERE fld_booking_id = ? AND status = 'Completed' 
+          ORDER BY id DESC LIMIT 1
+        `;
+
+        db.query(historySql, [bookingId], (err, historyResults) => {
+          if (err) {
+            return callback(err);
+          }
+
+          let callCompletedDate =
+            historyResults.length > 0
+              ? historyResults[0].fld_call_completed_date
+              : null;
+
+          if (!callCompletedDate) {
+            const overallSql = `
+              SELECT fld_addedon FROM tbl_booking_overall_history 
+              WHERE fld_booking_id = ? AND fld_comment LIKE '%Call Completed by%' 
+              ORDER BY id DESC LIMIT 1
+            `;
+
+            db.query(overallSql, [bookingId], (err, overallResults) => {
+              
+              if (err) return callback(err);
+
+              if (overallResults.length === 0) {
+                return callback(null, "call not completed");
+              }
+
+              const callDate = overallResults[0].fld_addedon;
+              const msg = `Call completed with client ${result1.fld_name} by consultant ${consultantId} on date ${callDate}`;
+              return callback(
+                null,
+                `${msg}||${result1.fld_consultantid}||${consultantId}`
+              );
+            });
+          } else {
+            const msg = `Call completed with client ${result1.fld_name} by consultant ${consultantId} on date ${callCompletedDate}`;
+            return callback(
+              null,
+              `${msg}||${result1.fld_consultantid}||${consultantId}`
+            );
+          }
+        });
+      });
+    });
+  
+};
+
+// Create promisified version of db.query for async/await usage
+const queryAsync = promisify(db.query).bind(db);
+
+const checkConsultantCompletedCallNew = async (
+  consultantId,
+  clientEmail,
+  saleType,
+  loginCrmId
+) => {
+  try {
+    // Step 1: Get the latest completed booking
+    const bookingSql = `
+      SELECT id, fld_name, fld_consultantid, fld_teamid 
+      FROM tbl_booking 
+      WHERE fld_consultantid = ? 
+        AND fld_email = ? 
+        AND fld_consultation_sts = 'Completed' 
+        AND fld_call_request_sts = 'Completed' 
+        AND fld_sale_type = ? 
+      ORDER BY id DESC LIMIT 1
+    `;
+
+    const bookingResults = await queryAsync(bookingSql, [consultantId, clientEmail, saleType]);
+    
+    if (bookingResults.length === 0) {
+      return { success: true, message: "call not completed" };
+    }
+
+    const booking = bookingResults[0];
+    const bookingTeamIds = booking.fld_teamid
+      .split(",")
+      .map(id => id.trim());
+
+    // Step 2: Get admin team info
+    const adminSql = `SELECT fld_team_id FROM tbl_admin WHERE id = ?`;
+    const adminResults = await queryAsync(adminSql, [loginCrmId]);
+    
+    if (adminResults.length === 0) {
+      return { success: false, error: "Admin not found" };
+    }
+
+    const loginTeamIds = adminResults[0].fld_team_id
+      .split(",")
+      .map(id => id.trim());
+
+    // Check team match
+    const isTeamMatch = bookingTeamIds.some(id => loginTeamIds.includes(id));
+    
+    if (isTeamMatch) {
+      return { success: true, message: "add call" };
+    }
+
+    // Step 3: Get call completion date - try both tables in parallel
+    const [historyResults, overallResults] = await Promise.all([
+      queryAsync(
+        `SELECT fld_call_completed_date FROM tbl_booking_sts_history 
+         WHERE fld_booking_id = ? AND status = 'Completed' 
+         ORDER BY id DESC LIMIT 1`,
+        [booking.id]
+      ),
+      queryAsync(
+        `SELECT fld_addedon FROM tbl_booking_overall_history 
+         WHERE fld_booking_id = ? AND fld_comment LIKE '%Call Completed by%' 
+         ORDER BY id DESC LIMIT 1`,
+        [booking.id]
+      )
+    ]);
+
+    // Determine call completion date
+    let callCompletedDate = null;
+    
+    if (historyResults.length > 0 && historyResults[0].fld_call_completed_date) {
+      callCompletedDate = historyResults[0].fld_call_completed_date;
+    } else if (overallResults.length > 0) {
+      callCompletedDate = overallResults[0].fld_addedon;
+    }
+
+    if (!callCompletedDate) {
+      return { success: true, message: "call not completed" };
+    }
+
+    // Return success with call details
+    const message = `Call completed with client ${booking.fld_name} by consultant ${consultantId} on date ${callCompletedDate}`;
+    return {
+      success: true,
+      message: `${message}||${booking.fld_consultantid}||${consultantId}`
+    };
+
+  } catch (error) {
+    console.error('Error in checkConsultantCompletedCall:', error);
+    return { success: false, error: error.message, message:error.message };
+  }
+};
+
+// Alternative version using connection pooling (recommended for high load)
+const checkConsultantCompletedCallPooled = async (
+  consultantId,
+  clientEmail,
+  saleType,
+  loginCrmId,
+  pool // Pass connection pool as parameter
+) => {
+  let connection;
+  
+  try {
+    // Get connection from pool
+    connection = await pool.getConnection();
+    
+    // Use the same optimized logic but with pooled connection
+    const queryPooled = promisify(connection.query).bind(connection);
+    
+    // Step 1: Get booking (with selected fields only for better performance)
+    const bookingSql = `
+      SELECT id, fld_name, fld_consultantid, fld_teamid 
+      FROM tbl_booking 
+      WHERE fld_consultantid = ? 
+        AND fld_email = ? 
+        AND fld_consultation_sts = 'Completed' 
+        AND fld_call_request_sts = 'Completed' 
+        AND fld_sale_type = ? 
+      ORDER BY id DESC LIMIT 1
+    `;
+
+    const bookingResults = await queryPooled(bookingSql, [consultantId, clientEmail, saleType]);
+    
+    if (bookingResults.length === 0) {
+      return { success: true, message: "call not completed" };
+    }
+
+    const booking = bookingResults[0];
+    const bookingTeamIds = booking.fld_teamid.split(",").map(id => id.trim());
+
+    // Step 2: Get admin team info
+    const adminResults = await queryPooled(
+      `SELECT fld_team_id FROM tbl_admin WHERE id = ?`, 
+      [loginCrmId]
+    );
+    
+    if (adminResults.length === 0) {
+      return { success: false, error: "Admin not found" };
+    }
+
+    const loginTeamIds = adminResults[0].fld_team_id.split(",").map(id => id.trim());
+    const isTeamMatch = bookingTeamIds.some(id => loginTeamIds.includes(id));
+    
+    if (isTeamMatch) {
+      return { success: true, message: "add call" };
+    }
+
+    // Step 3: Get call dates in parallel
+    const [historyResults, overallResults] = await Promise.all([
+      queryPooled(
+        `SELECT fld_call_completed_date FROM tbl_booking_sts_history 
+         WHERE fld_booking_id = ? AND status = 'Completed' 
+         ORDER BY id DESC LIMIT 1`,
+        [booking.id]
+      ),
+      queryPooled(
+        `SELECT fld_addedon FROM tbl_booking_overall_history 
+         WHERE fld_booking_id = ? AND fld_comment LIKE '%Call Completed by%' 
+         ORDER BY id DESC LIMIT 1`,
+        [booking.id]
+      )
+    ]);
+
+    let callCompletedDate = null;
+    
+    if (historyResults.length > 0 && historyResults[0].fld_call_completed_date) {
+      callCompletedDate = historyResults[0].fld_call_completed_date;
+    } else if (overallResults.length > 0) {
+      callCompletedDate = overallResults[0].fld_addedon;
+    }
+
+    if (!callCompletedDate) {
+      return { success: true, message: "call not completed" };
+    }
+
+    const message = `Call completed with client ${booking.fld_name} by consultant ${consultantId} on date ${callCompletedDate}`;
+    return {
+      success: true,
+      message: `${message}||${booking.fld_consultantid}||${consultantId}`
+    };
+
+  } catch (error) {
+    console.error('Error in checkConsultantCompletedCallPooled:', error);
+    return { success: false, error: error.message };
+  } finally {
+    // Always release connection back to pool
+    if (connection) connection.release();
+  }
+};
+
+
+const checkPresalesCall = (email, consultantId, callback) => {
+  
+
+    const query = `
+      SELECT * FROM tbl_booking 
+      WHERE fld_email = ? 
+        AND fld_consultantid = ? 
+        AND fld_sale_type = 'Presales' 
+        AND fld_call_request_sts NOT IN ('Reject', 'Cancelled') 
+        AND fld_consultation_sts != 'Reject'
+      LIMIT 1
+    `;
+
+    const values = [email, consultantId];
+
+    db.query(query, values, (error, results) => {
+
+      if (error) {
+        console.error("Query error:", error);
+        return callback(error, null);
+      }
+
+      return callback(null, results);
+    });
+  
+};
+
+const getClientCallsRequestPlanLimitOver = (
+  email,
+  status,
+  milestoneId,
+  callback
+) => {
+  if (!email) return callback(null, { totalrow: 0 });
+
+  const query = `
+    SELECT COUNT(*) as totalrow 
+    FROM tbl_booking 
+    WHERE fld_email = ? AND callDisabled = ? AND fld_rc_milestoneid = ?
+  `;
+
+
+    db.query(query, [email, status, milestoneId], (error, results) => {
+     
+      if (error) return callback(error);
+      callback(null, results[0]);
+    });
+  
+};
+
+const getMeetingId = (callback) => {
+  const query = `
+    SELECT fld_bookingcode 
+    FROM tbl_booking 
+    WHERE fld_bookingcode != '' 
+    ORDER BY id DESC 
+    LIMIT 1
+  `;
+
+
+    db.query(query, (error, results) => {
+      if (error) return callback(error);
+
+      let orderNo = 1;
+      if (results.length > 0) {
+        const lastCode = results[0].fld_bookingcode;
+        const parts = lastCode.split("#");
+        if (parts.length > 1) orderNo = parseInt(parts[1]) + 1;
+      }
+
+      const rand = Math.floor(Math.random() * (999 - 111 + 1)) + 111;
+      const padded = orderNo.toString().padStart(3, "0");
+      const newCode = `PGDN-MEETID${rand}#${padded}`;
+
+      callback(null, newCode);
+    });
+  
+};
+
+const insertBooking = (
+  bookingData,
+  crmId,
+  email,
+  sale_type = "",
+  consultantId = "",
+  forcePresalesAdd = "",
+  clientId = "",
+  callback
+) => {
+  const dbFields = [];
+  const dbValues = [];
+
+  let baseQuery = `SELECT * FROM tbl_booking WHERE fld_email = ?`;
+  dbValues.push(email);
+
+  if (sale_type === "Presales") {
+    baseQuery += ` AND fld_client_id = ?`;
+    dbValues.push(clientId);
+
+    if (parseInt(consultantId) > 0) {
+      baseQuery += ` AND fld_consultantid = ?`;
+      dbValues.push(consultantId);
+    }
+
+    baseQuery += `
+      AND fld_sale_type = 'Presales'
+      AND fld_call_request_sts NOT IN ('Client did not join', 'Completed', 'Reject', 'Cancelled')
+      AND fld_consultation_sts NOT IN ('Reject', 'Client did not join')
+    `;
+  } else {
+    baseQuery += `
+      AND fld_addedby = ?
+      AND fld_call_request_sts NOT IN ('Client did not join', 'Completed', 'Reject', 'Cancelled')
+      AND fld_sale_type != 'Presales'
+      AND fld_consultation_sts NOT IN ('Reject', 'Client did not join')
+    `;
+    dbValues.push(crmId);
+  }
+
+  baseQuery += ` AND callDisabled IS NULL`;
+
+ 
+    console.log(baseQuery)
+    console.log(dbValues)
+    db.query(baseQuery, dbValues, (selectErr, results) => {
+      if (selectErr) {
+        return callback(selectErr);
+      }
+
+      const allowInsert =
+        (results.length === 0 && email !== "") ||
+        (forcePresalesAdd === "Yes" && sale_type === "Presales");
+
+      if (allowInsert) {
+        const fields = Object.keys(bookingData);
+        const values = Object.values(bookingData);
+        const placeholders = fields.map(() => "?").join(", ");
+        const insertQuery = `INSERT INTO tbl_booking (${fields.join(
+          ", "
+        )}) VALUES (${placeholders})`;
+
+        db.query(insertQuery, values, (insertErr, result) => {
+          
+          if (insertErr) return callback(insertErr);
+          return callback(null, result.insertId);
+        });
+      } else {
+        return callback(null, false); 
+      }
+    });
+  
+};
+
+const updateBooking = (bookingId, updateData, callback) => {
+  const fields = Object.keys(updateData);
+  const values = Object.values(updateData);
+  const setClause = fields.map((field) => `${field} = ?`).join(", ");
+  const query = `UPDATE tbl_booking SET ${setClause} WHERE id = ?`;
+  values.push(bookingId);
+
+  
+
+    db.query(query, values, (error, result) => {
+      if (error) return callback(error);
+      callback(null, result.affectedRows > 0);
+    });
+  
+};
+
+const getConsultantId = (bookingId, callback) => {
+  let query = `
+    SELECT 
+      tb.*, 
+      trcbr.slot_time as rc_slot_time, 
+      trcbr.booking_date as rc_booking_date 
+    FROM tbl_booking tb 
+    LEFT JOIN tbl_rc_call_booking_request trcbr 
+      ON trcbr.id = tb.fld_call_request_id 
+    WHERE tb.callDisabled IS NULL
+  `;
+
+  const params = [];
+
+  if (bookingId) {
+    query += " AND tb.id = ?";
+    params.push(bookingId);
+  }
+
+  query += " ORDER BY tb.id DESC";
+
+  
+
+    db.query(query, params, (error, results) => {
+      
+      if (error) return callback(error);
+
+      callback(null, bookingId ? results[0] : results);
+    });
+  
+};
+
+const insertAddCallRequest = (data, callback) => {
+  const query = `
+    INSERT INTO tbl_approve_addcall_request 
+    (bookingId, planId, requestMessage, userId, addedon) 
+    VALUES (?, ?, ?, ?, ?)
+  `;
+
+ 
+
+    db.query(
+      query,
+      [
+        data.bookingId,
+        data.planId,
+        data.requestMessage,
+        data.userId,
+        data.addedon,
+      ],
+      (error, result) => {
+        if (error) return callback(error);
+
+        callback(null, result.insertId);
+      }
+    );
+  
+};
+
+const insertExternalCall = (data, callback) => {
+  const query = `
+    INSERT INTO tbl_external_calls 
+    (fld_booking_id, fld_call_added_by, fld_consultation_sts, fld_call_request_sts, fld_added_on) 
+    VALUES (?, ?, ?, ?, ?)
+  `;
+
+ 
+
+    db.query(
+      query,
+      [
+        data.fld_booking_id,
+        data.fld_call_added_by,
+        data.fld_consultation_sts,
+        data.fld_call_request_sts,
+        data.fld_added_on,
+      ],
+      (error, result) => {
+        if (error) return callback(error);
+
+        callback(null, result.insertId);
+      }
+    );
+  
+};
+
+const insertBookingHistory = (data, callback) => {
+  const fields = Object.keys(data);
+  const values = Object.values(data);
+  const placeholders = fields.map(() => "?").join(", ");
+
+  const query = `
+    INSERT INTO tbl_booking_overall_history (${fields.join(", ")}) 
+    VALUES (${placeholders})
+  `;
+
+  
+
+    db.query(query, values, (error, result) => {
+      
+      if (error) return callback(error);
+
+      callback(null, result.insertId);
+    });
+  
+};
+
+const insertBookingStatusHistory = (data, callback) => {
+  const fields = Object.keys(data);
+  const values = Object.values(data);
+  const placeholders = fields.map(() => "?").join(", ");
+  const query = `INSERT INTO tbl_booking_sts_history (${fields.join(
+    ", "
+  )}) VALUES (${placeholders})`;
+
+  
+
+    db.query(query, values, (error, result) => {
+      
+      if (error) return callback(error);
+
+      callback(null, result.insertId);
+    });
+  
+};
+
+const getAdmin = (adminId, adminType, callback) => {
+  let query = "SELECT * FROM tbl_admin WHERE id = ?";
+  const params = [adminId];
+
+  if (adminType) {
+    query += " AND fld_admin_type = ?";
+    params.push(adminType);
+  }
+
+  
+
+    db.query(query, params, (error, results) => {
+      
+      if (error) return callback(error);
+
+      callback(null, results[0]);
+    });
+  
+};
+
+const getAdminById = (adminId, callback) => {
+  if (!adminId) return callback(new Error("Admin ID is required"));
+
+  const query = "SELECT * FROM tbl_admin WHERE id = ?";
+
+
+
+    db.query(query, [adminId], (error, results) => {
+      
+      if (error) return callback(error);
+
+      if (results.length > 0) {
+        callback(null, results[0]);
+      } else {
+        callback(null, null); // No admin found
+      }
+    });
+  
+};
+
+const insertUser = (data, email, name, verifyCode, callback) => {
+  if (!email) {
+    return callback(null, false);
+  }
+
+  
+
+    // Check if user already exists
+    const checkQuery = "SELECT id FROM tbl_user WHERE fld_email = ?";
+    db.query(checkQuery, [email], (checkErr, checkResults) => {
+      if (checkErr) {
+        return callback(checkErr);
+      }
+
+      if (checkResults.length === 0) {
+        // Insert new user
+        const insertQuery = "INSERT INTO tbl_user SET ?";
+        db.query(insertQuery, data, (insertErr, insertResult) => {
+          
+          if (insertErr) return callback(insertErr);
+
+          return callback(null, insertResult.insertId);
+        });
+      } else {
+        // Return existing user ID
+        
+        return callback(null, checkResults[0].id);
+      }
+    });
+  
+};
+
+const updateRcCallRequestSts = (
+  callRequestId,
+  rcCallRequestId,
+  status,
+  callback = () => {}
+) => {
+  if (!callRequestId || !rcCallRequestId || !status) {
+    return callback(null, false);
+  }
+
+  
+
+    db.query(
+      `UPDATE tbl_rc_call_booking_request SET call_request_sts = ? WHERE id = ?`,
+      [status, callRequestId],
+      async (mainQueryErr) => {
+        
+
+        if (mainQueryErr) {
+          console.error("Main DB update error:", mainQueryErr);
+          return callback(mainQueryErr, null);
+        }
+
+        try {
+          // Call Zend API for RC DB update
+          await axios.get(
+            `https://rapidcollaborate.com/rc-main/cron/index/updaterccallrequest`,
+            {
+              params: {
+                rc_call_request_id: rcCallRequestId,
+                status,
+              },
+            }
+          );
+
+          return callback(null, true);
+        } catch (apiErr) {
+          console.error("Zend API call error:", apiErr);
+          return callback(apiErr, null);
+        }
+      }
+    );
+
+};
+
+const getRcCallBookingRequestById = (id, callback) => {
+  if (!id || Number(id) <= 0) {
+    return callback(new Error("Invalid ID provided"));
+  }
+
+ 
+
+    const sql = `
+      SELECT 
+        tbl_rc_call_booking_request.*, 
+        tbl_booking.id AS bookingid, 
+        crm.fld_name
+      FROM tbl_rc_call_booking_request
+      LEFT JOIN tbl_booking 
+        ON tbl_rc_call_booking_request.id = tbl_booking.fld_call_request_id
+      LEFT JOIN tbl_admin AS crm 
+        ON tbl_rc_call_booking_request.crmid = crm.id
+      WHERE tbl_rc_call_booking_request.id = ?
+      LIMIT 1
+    `;
+
+    db.query(sql, [id], (error, results) => {
+      
+      if (error) return callback(error);
+      return callback(null, results[0] || null);
+    });
+  
+};
+
+const getPostsaleCompletedCalls = (email, milestone_id, callback) => {
+  const query = `
+    SELECT COUNT(*) AS totalrow 
+    FROM tbl_booking 
+    WHERE fld_email = ? 
+      AND fld_call_request_sts = 'Completed'
+      AND fld_rc_milestoneid = ?
+  `;
+
+  
+
+    db.query(query, [email, milestone_id], (error, results) => {
+      
+      if (error) {
+        console.error("Query error (completed calls):", error);
+        return callback(error, null);
+      }
+
+      return callback(null, results[0]);
+    });
+  
+};
+
+const getBookingById = (bookingId, callback) => {
+  
+
+    const query = `
+      SELECT 
+        b.*,
+        a1.fld_client_code AS crm_client_code,
+        a1.fld_name AS crm_name,
+        a1.fld_email AS crm_email,
+        a2.fld_client_code AS consultant_client_code,
+        a2.fld_name AS consultant_name,
+        a2.fld_email AS consultant_email,
+        a3.fld_client_code AS sec_consultant_client_code,
+        a3.fld_name AS sec_consultant_name,
+        a3.fld_email AS sec_consultant_email,
+        u.fld_name AS user_name,
+        u.fld_email AS user_email,
+        u.fld_phone AS user_phone
+      FROM tbl_booking b
+      LEFT JOIN tbl_admin a1 ON b.fld_addedby = a1.id
+      LEFT JOIN tbl_admin a2 ON b.fld_consultantid = a2.id
+      LEFT JOIN tbl_admin a3 ON b.fld_secondary_consultant_id = a3.id
+      LEFT JOIN tbl_user u ON b.fld_userid = u.id
+      WHERE b.id = ?
+    `;
+
+    db.query(query, [bookingId], (err, results) => {
+      
+      callback(err, results);
+    });
+  
+};
+
+const getBookingRowById = (bookingId, callback) => {
+  
+
+    const query = `SELECT * FROM tbl_booking WHERE id = ?`;
+
+    db.query(query, [bookingId], (err, results) => {
+      
+      if (err) return callback(err, null);
+      callback(null, results[0] || null);
+    });
+  
+};
+
+const deleteBookingById = (bookingId, callback) => {
+  
+
+    const query = "DELETE FROM tbl_booking WHERE id = ?";
+    db.query(query, [bookingId], (error, result) => {
+
+      if (error) {
+        console.error("Delete query error:", error);
+        return callback(error, null);
+      }
+
+      callback(null, result);
+    });
+  
+};
+
+const getAllCrmIds = (callback) => {
+  const query = `
+    SELECT GROUP_CONCAT(id) AS crmids 
+    FROM tbl_admin 
+    WHERE fld_admin_type = 'EXECUTIVE' AND status = 'Active'
+  `;
+
+  
+
+    db.query(query, (error, results) => {
+    
+
+      if (error) return callback(error);
+
+      const crmIds = results[0]?.crmids || "";
+      callback(null, crmIds);
+    });
+  
+};
+
+const getBookingData = (params, callback) => {
+  const {
+    bookingId = "",
+    consultantId = "",
+    bookingDate = "",
+    bookingSlot = "",
+  } = params;
+
+  let conditions = [`tbl_booking.callDisabled IS NULL`];
+  let values = [];
+
+  if (bookingId) {
+    conditions.push(`tbl_booking.id = ?`);
+    values.push(bookingId);
+  }
+  if (consultantId) {
+    conditions.push(`tbl_booking.fld_consultantid = ?`);
+    values.push(consultantId);
+  }
+  if (bookingDate) {
+    conditions.push(`tbl_booking.fld_booking_date = ?`);
+    values.push(bookingDate);
+  }
+  if (bookingSlot) {
+    conditions.push(`tbl_booking.fld_booking_slot = ?`);
+    values.push(bookingSlot);
+  }
+
+  const whereClause = conditions.length
+    ? `WHERE ${conditions.join(" AND ")}`
+    : "";
+
+  const query = `
+    SELECT 
+      tbl_booking.*, 
+      tbl_admin.fld_client_code AS admin_code,
+      tbl_admin.fld_name AS admin_name,
+      tbl_admin.fld_email AS admin_email,
+      tbl_admin.fld_profile_image AS profile_image,
+      tbl_admin.fld_client_code AS consultant_code,
+      tbl_user.fld_user_code AS user_code,
+      tbl_user.fld_name AS user_name,
+      tbl_user.fld_email AS user_email,
+      tbl_user.fld_decrypt_password AS user_pass,
+      tbl_user.fld_country_code AS user_country_code,
+      tbl_user.fld_phone AS user_phone,
+      tbl_user.fld_address,
+      tbl_user.fld_city,
+      tbl_user.fld_pincode,
+      tbl_user.fld_country
+    FROM tbl_booking
+    LEFT JOIN tbl_admin ON tbl_booking.fld_consultantid = tbl_admin.id
+    LEFT JOIN tbl_user ON tbl_booking.fld_userid = tbl_user.id
+    ${whereClause}
+    ORDER BY tbl_booking.id DESC
+  `;
+
+  
+
+    try {
+      db.query(query, values, (error, results) => {
+       
+        if (error) return callback(error);
+
+        if (bookingId) {
+          callback(null, results[0] || null);
+        } else {
+          callback(null, results || []);
+        }
+      });
+    } catch (error) {
+      callback(error);
+    }
+  
+};
+
+const getOtherBookingData = (params, callback) => {
+  const {
+    bookingId = "",
+    consultantId = "",
+    bookingDate = "",
+    bookingSlot = "",
+    saleType = "",
+  } = params;
+
+  let conditions = [`tbl_booking.callDisabled IS NULL`];
+  let values = [];
+
+  if (bookingId) {
+    conditions.push(`tbl_booking.id != ?`);
+    values.push(bookingId);
+  }
+  if (consultantId) {
+    conditions.push(`tbl_booking.fld_consultantid = ?`);
+    values.push(consultantId);
+  }
+  if (bookingDate) {
+    conditions.push(`tbl_booking.fld_booking_date = ?`);
+    values.push(bookingDate);
+  }
+  if (bookingSlot) {
+    conditions.push(`tbl_booking.fld_booking_slot = ?`);
+    values.push(bookingSlot);
+  }
+  if (saleType) {
+    conditions.push(`tbl_booking.fld_sale_type = ?`);
+    values.push(saleType);
+  }
+
+  const whereClause = conditions.length
+    ? `WHERE ${conditions.join(" AND ")}`
+    : "";
+
+  const query = `
+    SELECT 
+      tbl_booking.*, 
+      tbl_admin.fld_client_code AS admin_code,
+      tbl_admin.fld_name AS admin_name,
+      tbl_admin.fld_email AS admin_email,
+      tbl_admin.fld_profile_image AS profile_image,
+      tbl_admin.fld_client_code AS consultant_code,
+      tbl_user.fld_user_code AS user_code,
+      tbl_user.fld_name AS user_name,
+      tbl_user.fld_email AS user_email,
+      tbl_user.fld_decrypt_password AS user_pass,
+      tbl_user.fld_country_code AS user_country_code,
+      tbl_user.fld_phone AS user_phone,
+      tbl_user.fld_address,
+      tbl_user.fld_city,
+      tbl_user.fld_pincode,
+      tbl_user.fld_country
+    FROM tbl_booking
+    LEFT JOIN tbl_admin ON tbl_booking.fld_consultantid = tbl_admin.id
+    LEFT JOIN tbl_user ON tbl_booking.fld_userid = tbl_user.id
+    ${whereClause}
+    ORDER BY tbl_booking.id DESC
+  `;
+
+
+
+    try {
+      db.query(query, values, (error, results) => {
+        
+        if (error) return callback(error);
+
+        callback(null, results || []);
+      });
+    } catch (error) {
+      
+      callback(error);
+    }
+  
+};
+
+const submitReassignComment = (bookingid, reassign_comment, callback) => {
+  
+
+    // Step 1: Update booking table
+    const updateQuery = `
+      UPDATE tbl_booking 
+      SET fld_reassign_comment = ?, fld_call_request_sts = 'Reassign Request'
+      WHERE id = ?
+    `;
+
+    db.query(
+      updateQuery,
+      [reassign_comment, bookingid],
+      (err, result) => {
+        if (err) {
+          return callback(err);
+        }
+
+        // Step 2: Insert comment history
+        const comment = `Call reassign request submitted on ${new Date().toLocaleString()}`;
+        const insertHistoryQuery = `
+        INSERT INTO tbl_booking_comments (fld_booking_id, fld_comment, fld_notif_for, fld_notif_for_id, fld_addedon)
+        VALUES (?, ?, 'SUPERADMIN', 1, CURDATE())
+      `;
+
+        db.query(
+          insertHistoryQuery,
+          [bookingid, comment],
+          (err, result2) => {
+            if (err) {
+              return callback(err);
+            }
+
+            // Step 3: Get related call request IDs
+            const selectBookingQuery = `
+          SELECT fld_call_request_id, fld_rc_call_request_id 
+          FROM tbl_booking 
+          WHERE id = ?
+        `;
+
+            db.query(selectBookingQuery, [bookingid], (err, rows) => {
+              if (err) {
+                return callback(err);
+              }
+
+              const { fld_call_request_id, fld_rc_call_request_id } =
+                rows[0] || {};
+
+              // Step 4: Update RC call request status if both IDs present
+              if (fld_call_request_id > 0 && fld_rc_call_request_id > 0) {
+                const updateRCQuery = `
+              UPDATE tbl_rc_call_booking_request 
+              SET call_status = 'Reassign Request' 
+              WHERE id = ? AND call_id = ?
+            `;
+
+                db.query(
+                  updateRCQuery,
+                  [fld_rc_call_request_id, fld_call_request_id],
+                  (err, finalRes) => {
+                    if (err) return callback(err);
+                    return callback(
+                      null,
+                      "Reassign request updated successfully"
+                    );
+                  }
+                );
+              } else {
+                return callback(
+                  null,
+                  "Reassign comment added (no RC update required)"
+                );
+              }
+            });
+          }
+        );
+      }
+    );
+  
+};
+
+const getExternalCallInfo = (id = 0, bookingId = 0, callback) => {
+  
+
+    try {
+      let query = `SELECT * FROM tbl_external_calls WHERE 1=1`;
+      const params = [];
+
+      if (id > 0) {
+        query += ` AND id = ?`;
+        params.push(id);
+      }
+
+      if (bookingId > 0) {
+        query += ` AND fld_booking_id = ?`;
+        params.push(bookingId);
+      }
+
+      query += ` ORDER BY id DESC LIMIT 1`;
+
+      db.query(query, params, (error, results) => {
+      
+
+        if (error) return callback(error);
+        if (results.length > 0) {
+          callback(null, results[0]);
+        } else {
+          callback(null, null); // No record found
+        }
+      });
+    } catch (error) {
+      callback(error);
+    }
+  
+};
+
+const updateExternalCallsStatus = (bookingId, updateData, callback) => {
+  if (
+    !bookingId ||
+    typeof updateData !== "object" ||
+    Object.keys(updateData).length === 0
+  ) {
+    return callback(new Error("Invalid bookingId or updateData"));
+  }
+
+  
+
+    try {
+      const fields = Object.keys(updateData);
+      const values = Object.values(updateData);
+      const setClause = fields.map((field) => `${field} = ?`).join(", ");
+
+      const query = `UPDATE tbl_external_calls SET ${setClause} WHERE fld_booking_id = ?`;
+      values.push(bookingId);
+
+      db.query(query, values, (error, results) => {
+       
+        if (error) return callback(error);
+        callback(null, results);
+      });
+    } catch (error) {
+      callback(error);
+    }
+  
+};
+
+const getFullBookingData = (bookingId, callback) => {
+  if (!bookingId) {
+    return callback(new Error("Invalid bookingId"), null);
+  }
+
+ 
+
+    try {
+      const query = `
+        SELECT 
+          b.*,
+          u.fld_name AS user_name,
+          u.fld_email AS user_email,
+          u.fld_phone AS user_phone,
+          a.fld_name AS admin_name
+        FROM tbl_booking b
+        LEFT JOIN tbl_user u ON b.fld_userid = u.id
+        LEFT JOIN tbl_admin a ON b.fld_consultantid = a.id
+        WHERE b.id = ?
+      `;
+
+      db.query(query, [bookingId], (error, results) => {
+        
+        if (error) return callback(error, null);
+        callback(null, results[0] || null);
+      });
+    } catch (error) {
+      callback(error, null);
+    }
+  
+};
+
+const getExternalCallCountByBookingId = (bookingId, callback) => {
+  
+
+    try {
+      const query = `SELECT COUNT(*) AS totalrow FROM tbl_external_calls WHERE fld_booking_id = ?`;
+
+      db.query(query, [bookingId], (error, results) => {
+        
+
+        if (error) return callback(error);
+        const count = results[0]?.totalrow || 0;
+        callback(null, count);
+      });
+    } catch (error) {
+      callback(error);
+    }
+  
+};
+
+const getBookingStatusHistory = (bookingId, status, callback) => {
+  const sql = `
+    SELECT * FROM tbl_booking_sts_history WHERE fld_booking_id = ? AND status = ? ORDER BY id DESC
+  `;
+
+
+    db.query(sql, [bookingId, status], (queryErr, results) => {
+      
+      if (queryErr) return callback(queryErr);
+      return callback(null, results);
+    });
+  
+};
+
+const getAllClientBookings = (clientId, callback) => {
+  const query = `
+    SELECT 
+      tbl_booking.*, 
+      tbl_admin.fld_client_code AS admin_code,
+      tbl_admin.fld_name AS admin_name,
+      tbl_admin.fld_email AS admin_email,
+      tbl_admin.fld_profile_image AS profile_image,
+      tbl_admin.fld_client_code AS consultant_code,
+      tbl_user.fld_user_code AS user_code,
+      tbl_user.fld_name AS user_name,
+      tbl_user.fld_email AS user_email,
+      tbl_user.fld_decrypt_password AS user_pass,
+      tbl_user.fld_country_code AS user_country_code,
+      tbl_user.fld_phone AS user_phone,
+      tbl_user.fld_address,
+      tbl_user.fld_city,
+      tbl_user.fld_pincode,
+      tbl_user.fld_country
+    FROM tbl_booking
+    LEFT JOIN tbl_admin ON tbl_booking.fld_consultantid = tbl_admin.id
+    LEFT JOIN tbl_user ON tbl_booking.fld_userid = tbl_user.id
+    WHERE tbl_booking.fld_client_id = ?
+    ORDER BY tbl_booking.id DESC
+  `;
+
+ 
+
+    db.query(query, [clientId], (error, results) => {
+      
+      if (error) return callback(error);
+      callback(null, results || []);
+    });
+  
+};
+
+const getLatestCompletedBooking = (consultantId, email, callback) => {
+  const sql = `
+    SELECT * FROM tbl_booking 
+    WHERE fld_consultantid = ? 
+    AND fld_email = ? 
+    AND fld_consultation_sts = 'Completed' 
+    AND fld_call_request_sts = 'Completed' 
+    AND fld_sale_type = 'Presales' 
+    ORDER BY id DESC LIMIT 1
+  `;
+
+  
+
+    db.query(sql, [consultantId, email], (queryErr, results) => {
+      
+      if (queryErr) return callback(queryErr);
+      callback(null, results);
+    });
+  
+};
+
+const getLatestCompletedBookingStatusHistory = (
+  bookingId,
+  status,
+  callback
+) => {
+  const sql = `
+    SELECT *
+    FROM tbl_booking_sts_history
+    WHERE fld_booking_id = ?
+      AND status = ?
+    ORDER BY id DESC
+    LIMIT 1
+  `;
+
+  
+
+    db.query(sql, [bookingId, status], (queryErr, results) => {
+      
+      if (queryErr) return callback(queryErr);
+      return callback(null, results);
+    });
+  
+};
+
+const getLatestCompletedBookingHistory = (bookingId, callback) => {
+  const sql = `
+    SELECT 
+      id,
+      fld_booking_id,
+      fld_comment,
+      fld_rescheduled_date_time,
+      fld_addedon,
+      fld_notif_view_sts,
+      fld_notif_for,
+      fld_notif_for_id,
+      view_sts,
+      crmIdsNotifi,
+      fld_consultantid
+    FROM tbl_booking_overall_history
+    WHERE fld_booking_id = ?
+      AND fld_comment LIKE '%Call Completed by%'
+    ORDER BY id DESC
+    LIMIT 1
+  `;
+
+  
+
+    db.query(sql, [bookingId], (queryErr, results) => {
+      
+      if (queryErr) return callback(queryErr);
+      return callback(null, results);
+    });
+  
+};
+
+const checkConflictingBookings = (
+  consultantId,
+  bookingDate,
+  bookingslot,
+  slotVariants,
+  callback
+) => {
+  const sql = `
+    SELECT * FROM tbl_booking
+    WHERE fld_consultantid = ?
+      AND fld_booking_date = ?
+      AND (
+        fld_booking_slot IN (?, ?, ?)
+        OR FIND_IN_SET(?, fld_slots_booked)
+      )
+  `;
+
+  const params = [consultantId, bookingDate, ...slotVariants, bookingslot];
+
+  
+
+    db.query(sql, params, (queryErr, results) => {
+      if (queryErr) return callback(queryErr, null);
+      callback(null, results);
+    });
+   
+};
+
+const fetchSummaryBookingsOld = (
+  userId,
+  userType,
+  subadminType = null ,
+  assignedTeam,
+  filters,
+  type,
+  page = 1,
+  callback
+  // Add subadminType parameter
+) => {
+  const currentDate = moment().format("YYYY-MM-DD");
+  const nextDay = moment().add(1, "day").format("YYYY-MM-DD");
+  const yesterday = moment().subtract(1, "day").format("YYYY-MM-DD");
+
+  const limit = 50;
+  const offset = (page - 1) * limit;
+
+  let sql = `
+    SELECT 
+      b.*,
+      admin.fld_client_code AS admin_code,
+      admin.fld_name AS admin_name,
+      admin.fld_email AS admin_email,
+      admin.fld_profile_image AS profile_image,
+      admin.fld_client_code AS consultant_code,
+      user.fld_user_code AS user_code,
+      user.fld_name AS user_name,
+      user.fld_email AS user_email,
+      user.fld_decrypt_password AS user_pass,
+      user.fld_country_code AS user_country_code,
+      user.fld_phone AS user_phone,
+      user.fld_address,
+      user.fld_city,
+      user.fld_pincode,
+      user.fld_country,
+      addedby.id AS crm_id,
+      addedby.fld_name AS crm_name
+    FROM tbl_booking b
+    LEFT JOIN tbl_admin admin ON b.fld_consultantid = admin.id
+    LEFT JOIN tbl_admin addedby ON b.fld_addedby = addedby.id
+    INNER JOIN tbl_user user ON b.fld_userid = user.id
+    WHERE b.callDisabled IS NULL
+  `;
+
+  // Count query for pagination
+  let countSql = `
+    SELECT COUNT(*) as total
+    FROM tbl_booking b
+    LEFT JOIN tbl_admin admin ON b.fld_consultantid = admin.id
+    LEFT JOIN tbl_admin addedby ON b.fld_addedby = addedby.id
+    INNER JOIN tbl_user user ON b.fld_userid = user.id
+    WHERE b.callDisabled IS NULL
+  `;
+
+  const params = [];
+  const countParams = [];
+
+  const buildFilters = () => {
+    // Consultation status filtering
+    if (
+      filters.consultationStatus &&
+      Array.isArray(filters.consultationStatus)
+    ) {
+      if (filters.consultationStatus.includes("Converted")) {
+        const condition = ` AND b.fld_converted_sts = ?`;
+        sql += condition;
+        countSql += condition;
+        params.push("Yes");
+        countParams.push("Yes");
+      } else {
+        const statusConditions = filters.consultationStatus
+          .map(() => "FIND_IN_SET(?, b.fld_call_request_sts)")
+          .join(" OR ");
+        const condition = ` AND (${statusConditions})`;
+        sql += condition;
+        countSql += condition;
+        params.push(...filters.consultationStatus);
+        countParams.push(...filters.consultationStatus);
+      }
+    } else if (filters.consultationStatus) {
+      if (filters.consultationStatus === "Converted") {
+        const condition = ` AND b.fld_converted_sts = ?`;
+        sql += condition;
+        countSql += condition;
+        params.push("Yes");
+        countParams.push("Yes");
+      } else {
+        const condition = ` AND FIND_IN_SET(?, b.fld_call_request_sts)`;
+        sql += condition;
+        countSql += condition;
+        params.push(filters.consultationStatus);
+        countParams.push(filters.consultationStatus);
+      }
+    }
+
+    // Sale type filtering
+    if (filters.sale_type && Array.isArray(filters.sale_type)) {
+      const saleConditions = filters.sale_type
+        .map(() => "FIND_IN_SET(?, b.fld_sale_type)")
+        .join(" OR ");
+      const condition = ` AND (${saleConditions})`;
+      sql += condition;
+      countSql += condition;
+      params.push(...filters.sale_type);
+      countParams.push(...filters.sale_type);
+    } else if (filters.sale_type) {
+      const condition = ` AND FIND_IN_SET(?, b.fld_sale_type)`;
+      sql += condition;
+      countSql += condition;
+      params.push(filters.sale_type);
+      countParams.push(filters.sale_type);
+    }
+
+    // Call request status filtering
+    if (filters.callRequestStatus) {
+      if (
+        filters.callRequestStatus === "Accept" &&
+        filters.callConfirmationStatus
+      ) {
+        const condition = ` AND b.fld_call_request_sts = ? AND b.fld_call_confirmation_status = ?`;
+        sql += condition;
+        countSql += condition;
+        params.push(filters.callRequestStatus, filters.callConfirmationStatus);
+        countParams.push(
+          filters.callRequestStatus,
+          filters.callConfirmationStatus
+        );
+      } else {
+        const condition = ` AND b.fld_call_request_sts = ?`;
+        sql += condition;
+        countSql += condition;
+        params.push(filters.callRequestStatus);
+        countParams.push(filters.callRequestStatus);
+      }
+    }
+
+    // Basic filters
+    const basicFilters = [
+      { key: "executiveId", field: "b.fld_addedby" },
+      { key: "bookingId", field: "b.id" },
+      { key: "consultantId", field: "b.fld_consultantid" },
+      { key: "secondaryConsultantId", field: "b.fld_secondary_consultant_id" },
+      { key: "userId", field: "b.fld_userid" },
+      { key: "status", field: "b.status" },
+      { key: "externalAssign", field: "b.fld_call_external_assign" },
+      { key: "crmId", field: "b.fld_addedby" },
+      { key: "particularStatus", field: "b.fld_call_request_sts" },
+      { key: "recordingStatus", field: "b.fld_recording_status" },
+    ];
+
+    basicFilters.forEach((filter) => {
+      if (filters[filter.key]) {
+        const condition = ` AND ${filter.field} = ?`;
+        sql += condition;
+        countSql += condition;
+        params.push(filters[filter.key]);
+        countParams.push(filters[filter.key]);
+      }
+    });
+
+    // Team ID filtering
+    if (filters.teamId) {
+      const condition = ` AND FIND_IN_SET(?, b.fld_teamid)`;
+      sql += condition;
+      countSql += condition;
+      params.push(filters.teamId);
+      countParams.push(filters.teamId);
+    }
+
+    // From now data filtering
+    if (filters.fromNowData) {
+      const condition = ` AND b.fld_booking_date >= ?`;
+      sql += condition;
+      countSql += condition;
+      params.push(filters.fromNowData);
+      countParams.push(filters.fromNowData);
+    }
+
+    buildDateFilters();
+
+    // Keyword search
+    if (filters.search) {
+      const condition = ` AND (b.fld_name LIKE ? OR b.fld_email LIKE ? OR user.fld_name LIKE ? OR user.fld_email LIKE ?)`;
+      sql += condition;
+      countSql += condition;
+      const searchParams = [
+        `%${filters.search}%`,
+        `%${filters.search}%`,
+        `%${filters.search}%`,
+        `%${filters.search}%`,
+      ];
+      params.push(...searchParams);
+      countParams.push(...searchParams);
+    }
+
+    addOrderBy();
+    addLimit();
+  };
+
+  const buildDateFilters = () => {
+    const isCreatedFilter =
+      filters.filter_type === "Created" ||
+      (!filters.filter_type &&
+        ["EXECUTIVE", "SUPERADMIN", "SUBADMIN"].includes(userType));
+
+    const isBookingFilter =
+      !filters.particularStatus &&
+      (filters.filter_type === "Booking" ||
+        (!filters.filter_type &&
+          !["EXECUTIVE", "SUPERADMIN", "SUBADMIN"].includes(userType)));
+
+    const dateField = isCreatedFilter ? "b.fld_addedon" : "b.fld_booking_date";
+
+    if (
+      (isCreatedFilter || isBookingFilter) &&
+      filters.fromDate &&
+      filters.toDate
+    ) {
+      if (filters.fromDate === filters.toDate) {
+        const condition = ` AND DATE(${dateField}) = ?`;
+        sql += condition;
+        countSql += condition;
+        params.push(filters.fromDate);
+        countParams.push(filters.fromDate);
+      } else {
+        const condition = ` AND DATE(${dateField}) BETWEEN ? AND ?`;
+        sql += condition;
+        countSql += condition;
+        params.push(filters.fromDate, filters.toDate);
+        countParams.push(filters.fromDate, filters.toDate);
+      }
+    }
+  };
+
+  const addOrderBy = () => {
+    sql += ` ORDER BY b.id DESC`;
+  };
+
+  const addLimit = () => {
+    if (type === "all") {
+      sql += ` LIMIT ? OFFSET ?`;
+      params.push(limit, offset);
+    } else {
+      sql += ` LIMIT 50`;
+    }
+  };
+
+  const executeQuery = () => {
+    buildFilters();
+
+    // If pagination is needed, get total count first
+    if (type === "all") {
+      db.query(countSql, countParams, (countErr, countResults) => {
+        if (countErr) {
+          return callback(countErr);
+        }
+
+        const totalRecords = countResults[0].total;
+        const totalPages = Math.ceil(totalRecords / limit);
+
+        // Execute main query
+        db.query(sql, params, (err, results) => {
+          
+          if (err) return callback(err);
+
+          const paginationData = {
+            data: results || [],
+            pagination: {
+              currentPage: page,
+              totalPages,
+              totalRecords,
+              limit,
+              hasNextPage: page < totalPages,
+              hasPreviousPage: page > 1,
+            },
+          };
+
+          if (filters.bookingId) {
+            return callback(null, results.length > 0 ? results[0] : false);
+          } else {
+            return callback(null, paginationData);
+          }
+        });
+      });
+    } else {
+      // Non-paginated query
+      db.query(sql, params, (err, results) => {
+        
+        if (err) return callback(err);
+
+        if (results.length > 0) {
+          if (filters.bookingId) {
+            return callback(null, results[0]);
+          } else {
+            return callback(null, results);
+          }
+        } else {
+          return callback(null, false);
+        }
+      });
+    }
+  };
+
+  const handleUserTypeAccess = () => {
+    // Handle SUPERADMIN access - has access to all bookings
+    if (userType === "SUPERADMIN") {
+      executeQuery();
+    }
+    // Handle SUBADMIN access based on teams and subadmin type
+    else if (userType === "SUBADMIN" && assignedTeam) {
+      const teamIds = assignedTeam
+        .split(",")
+        .map((id) => id.trim())
+        .filter(Boolean);
+
+      if (subadminType === "consultant_sub") {
+        // Only fetch bookings for consultants in assigned teams
+        if (teamIds.length > 0) {
+          const placeholders = teamIds
+            .map(() => "FIND_IN_SET(?, a.fld_team_id)")
+            .join(" OR ");
+          const adminQuery = `SELECT id FROM tbl_admin a WHERE ${placeholders}`;
+
+          db.query(adminQuery, teamIds, (err, adminRows) => {
+            if (err) {
+              return callback(err);
+            }
+
+            const consultantIds = adminRows.map((row) => row.id);
+            if (consultantIds.length === 0) {
+              
+              return callback(null, []);
+            }
+
+            const uidPlaceholders = consultantIds.map(() => "?").join(",");
+            sql += ` AND b.fld_consultantid IN (${uidPlaceholders})`;
+            countSql += ` AND b.fld_consultantid IN (${uidPlaceholders})`;
+            params.push(...consultantIds);
+            countParams.push(...consultantIds);
+
+            executeQuery();
+          });
+        } else {
+          const consultantCondition = ` AND b.fld_consultantid = ?`;
+          sql += consultantCondition;
+          countSql += consultantCondition;
+          params.push(userId);
+          countParams.push(userId);
+          executeQuery();
+        }
+      } else {
+        // Other SUBADMINs: fetch bookings added by them or their team members
+        if (teamIds.length > 0) {
+          const placeholders = teamIds
+            .map(() => "FIND_IN_SET(?, a.fld_team_id)")
+            .join(" OR ");
+          const adminQuery = `SELECT id FROM tbl_admin a WHERE ${placeholders}`;
+
+          db.query(adminQuery, teamIds, (err, adminRows) => {
+            if (err) {
+              return callback(err);
+            }
+
+            const adminIds = adminRows.map((row) => row.id);
+            const uniqueUserIds = [...new Set([...adminIds, userId])];
+
+            if (uniqueUserIds.length === 0) {
+              return callback(null, []);
+            }
+
+            const uidPlaceholders = uniqueUserIds.map(() => "?").join(",");
+            const condition = ` AND (b.fld_consultantid IN (${uidPlaceholders}) OR b.fld_addedby IN (${uidPlaceholders}))`;
+            sql += condition;
+            countSql += condition;
+            params.push(...uniqueUserIds, ...uniqueUserIds);
+            countParams.push(...uniqueUserIds, ...uniqueUserIds);
+
+            executeQuery();
+          });
+        } else {
+          const condition = ` AND (b.fld_consultantid = ? OR b.fld_addedby = ?)`;
+          sql += condition;
+          countSql += condition;
+          params.push(userId, userId);
+          countParams.push(userId, userId);
+          executeQuery();
+        }
+      }
+    }
+    // Handle CONSULTANT access - skip consultant assigned and postponed
+    else if (userType === "CONSULTANT") {
+      const condition = ` AND b.fld_consultantid = ? AND b.fld_call_request_sts NOT IN (?, ?)`;
+      sql += condition;
+      countSql += condition;
+      params.push(userId, "Consultant Assigned", "Postponed");
+      countParams.push(userId, "Consultant Assigned", "Postponed");
+      executeQuery();
+    }
+    // Handle EXECUTIVE access
+    else if (userType === "EXECUTIVE") {
+      const condition = ` AND b.fld_addedby = ?`;
+      sql += condition;
+      countSql += condition;
+      params.push(userId);
+      countParams.push(userId);
+      executeQuery();
+    }
+    // Fallback - no access
+    else {
+      const noAccessCondition = ` AND 1 = 0`;
+      sql += noAccessCondition;
+      countSql += noAccessCondition;
+      executeQuery();
+    }
+  };
+
+  
+    handleUserTypeAccess();
+
+};
+
+// Query builder function - builds SQL queries and parameters based on filters and user access
+const buildBookingQuery = (userId, userType, subadminType, assignedTeam, filters, type, page) => {
+  const currentDate = moment().format("YYYY-MM-DD");
+  const nextDay = moment().add(1, "day").format("YYYY-MM-DD");
+  const yesterday = moment().subtract(1, "day").format("YYYY-MM-DD");
+
+  const limit = 50;
+  const offset = (page - 1) * limit;
+
+  // Base queries
+  let sql = `
+    SELECT 
+      b.*,
+      admin.fld_client_code AS admin_code,
+      admin.fld_name AS admin_name,
+      admin.fld_email AS admin_email,
+      admin.fld_profile_image AS profile_image,
+      admin.fld_client_code AS consultant_code,
+      user.fld_user_code AS user_code,
+      user.fld_name AS user_name,
+      user.fld_email AS user_email,
+      user.fld_decrypt_password AS user_pass,
+      user.fld_country_code AS user_country_code,
+      user.fld_phone AS user_phone,
+      user.fld_address,
+      user.fld_city,
+      user.fld_pincode,
+      user.fld_country,
+      addedby.id AS crm_id,
+      addedby.fld_name AS crm_name
+    FROM tbl_booking b
+    LEFT JOIN tbl_admin admin ON b.fld_consultantid = admin.id
+    LEFT JOIN tbl_admin addedby ON b.fld_addedby = addedby.id
+    INNER JOIN tbl_user user ON b.fld_userid = user.id
+    WHERE b.callDisabled IS NULL
+  `;
+
+  let countSql = `
+    SELECT COUNT(*) as total
+    FROM tbl_booking b
+    LEFT JOIN tbl_admin admin ON b.fld_consultantid = admin.id
+    LEFT JOIN tbl_admin addedby ON b.fld_addedby = addedby.id
+    INNER JOIN tbl_user user ON b.fld_userid = user.id
+    WHERE b.callDisabled IS NULL
+  `;
+
+  const params = [];
+  const countParams = [];
+
+  // Helper function to add condition to both queries
+  const addCondition = (condition, paramValues = []) => {
+    sql += condition;
+    countSql += condition;
+    params.push(...paramValues);
+    countParams.push(...paramValues);
+  };
+
+  // Build filter conditions
+  const buildFilterConditions = () => {
+    // Consultation status filtering
+    if (filters.consultationStatus && Array.isArray(filters.consultationStatus)) {
+      if (filters.consultationStatus.includes("Converted")) {
+        addCondition(` AND b.fld_converted_sts = ?`, ["Yes"]);
+      } else {
+        const statusConditions = filters.consultationStatus
+          .map(() => "FIND_IN_SET(?, b.fld_call_request_sts)")
+          .join(" OR ");
+        addCondition(` AND (${statusConditions})`, filters.consultationStatus);
+      }
+    } else if (filters.consultationStatus) {
+      if (filters.consultationStatus === "Converted") {
+        addCondition(` AND b.fld_converted_sts = ?`, ["Yes"]);
+      } else {
+        addCondition(` AND FIND_IN_SET(?, b.fld_call_request_sts)`, [filters.consultationStatus]);
+      }
+    }
+
+    // Sale type filtering
+    if (filters.sale_type && Array.isArray(filters.sale_type)) {
+      const saleConditions = filters.sale_type
+        .map(() => "FIND_IN_SET(?, b.fld_sale_type)")
+        .join(" OR ");
+      addCondition(` AND (${saleConditions})`, filters.sale_type);
+    } else if (filters.sale_type) {
+      addCondition(` AND FIND_IN_SET(?, b.fld_sale_type)`, [filters.sale_type]);
+    }
+
+    // Call request status filtering
+    if (filters.callRequestStatus) {
+      if (filters.callRequestStatus === "Accept" && filters.callConfirmationStatus) {
+        addCondition(
+          ` AND b.fld_call_request_sts = ? AND b.fld_call_confirmation_status = ?`,
+          [filters.callRequestStatus, filters.callConfirmationStatus]
+        );
+      } else {
+        addCondition(` AND b.fld_call_request_sts = ?`, [filters.callRequestStatus]);
+      }
+    }
+
+    // Basic filters
+    const basicFilters = [
+      { key: "executiveId", field: "b.fld_addedby" },
+      { key: "bookingId", field: "b.id" },
+      { key: "consultantId", field: "b.fld_consultantid" },
+      { key: "secondaryConsultantId", field: "b.fld_secondary_consultant_id" },
+      { key: "userId", field: "b.fld_userid" },
+      { key: "status", field: "b.status" },
+      { key: "externalAssign", field: "b.fld_call_external_assign" },
+      { key: "crmId", field: "b.fld_addedby" },
+      { key: "particularStatus", field: "b.fld_call_request_sts" },
+      { key: "recordingStatus", field: "b.fld_recording_status" },
+    ];
+
+    basicFilters.forEach((filter) => {
+      if (filters[filter.key]) {
+        addCondition(` AND ${filter.field} = ?`, [filters[filter.key]]);
+      }
+    });
+
+    // Team ID filtering
+    if (filters.teamId) {
+      addCondition(` AND FIND_IN_SET(?, b.fld_teamid)`, [filters.teamId]);
+    }
+
+    // From now data filtering
+    if (filters.fromNowData) {
+      addCondition(` AND b.fld_booking_date >= ?`, [filters.fromNowData]);
+    }
+
+    // Date filters
+    buildDateFilters();
+
+    // Keyword search
+    if (filters.search) {
+      const searchParams = [
+        `%${filters.search}%`,
+        `%${filters.search}%`,
+        `%${filters.search}%`,
+        `%${filters.search}%`,
+      ];
+      addCondition(
+        ` AND (b.fld_name LIKE ? OR b.fld_email LIKE ? OR user.fld_name LIKE ? OR user.fld_email LIKE ?)`,
+        searchParams
+      );
+    }
+  };
+
+  const buildDateFilters = () => {
+    const isCreatedFilter =
+      filters.filter_type === "Created" ||
+      (!filters.filter_type && ["EXECUTIVE", "SUPERADMIN", "SUBADMIN"].includes(userType));
+
+    const isBookingFilter =
+      !filters.particularStatus &&
+      (filters.filter_type === "Booking" ||
+        (!filters.filter_type && !["EXECUTIVE", "SUPERADMIN", "SUBADMIN"].includes(userType)));
+
+    const dateField = isCreatedFilter ? "b.fld_addedon" : "b.fld_booking_date";
+
+    if ((isCreatedFilter || isBookingFilter) && filters.fromDate && filters.toDate) {
+      if (filters.fromDate === filters.toDate) {
+        addCondition(` AND DATE(${dateField}) = ?`, [filters.fromDate]);
+      } else {
+        addCondition(` AND DATE(${dateField}) BETWEEN ? AND ?`, [filters.fromDate, filters.toDate]);
+      }
+    }
+  };
+
+  // Build user type access conditions
+  const buildUserTypeConditions = () => {
+    switch (userType) {
+      case "SUPERADMIN":
+        // SUPERADMIN has access to all bookings - no additional conditions
+        break;
+
+      case "CONSULTANT":
+        addCondition(
+          ` AND b.fld_consultantid = ? AND b.fld_call_request_sts NOT IN (?, ?)`,
+          [userId, "Consultant Assigned", "Postponed"]
+        );
+        break;
+
+      case "EXECUTIVE":
+        addCondition(` AND b.fld_addedby = ?`, [userId]);
+        break;
+
+      case "SUBADMIN":
+        if (!assignedTeam) {
+          // No team assigned - no access
+          addCondition(` AND 1 = 0`);
+          break;
+        }
+
+        const teamIds = assignedTeam.split(",").map((id) => id.trim()).filter(Boolean);
+        
+        if (subadminType === "consultant_sub") {
+          // For consultant subadmins - need to get consultants from assigned teams
+          return {
+            needsTeamQuery: true,
+            teamIds,
+            queryType: "consultant_sub"
+          };
+        } else {
+          // Other SUBADMINs - need to get team members
+          return {
+            needsTeamQuery: true,
+            teamIds,
+            queryType: "other_subadmin",
+            userId
+          };
+        }
+
+      default:
+        // No access for unknown user types
+        addCondition(` AND 1 = 0`);
+        break;
+    }
+    return { needsTeamQuery: false };
+  };
+
+  // Build all conditions
+  buildFilterConditions();
+  const userTypeResult = buildUserTypeConditions();
+
+  // IMPORTANT: Don't add ORDER BY and LIMIT here if needsTeamQuery is true
+  // They will be added after team conditions in fetchSummaryBookings
+  if (!userTypeResult.needsTeamQuery) {
+    sql += ` ORDER BY b.id DESC`;
+    
+    if (type === "all") {
+      sql += ` LIMIT ? OFFSET ?`;
+      params.push(limit, offset);
+    } else {
+      sql += ` LIMIT 50`;
+    }
+  }
+
+  return {
+    sql,
+    countSql,
+    params,
+    countParams,
+    limit,
+    userTypeResult,
+    needsPagination: type === "all",
+    type // Pass type for later use
+  };
+};
+
+// Main execution function - handles the actual database queries
+const fetchSummaryBookings = async (
+  userId,
+  userType,
+  subadminType = null,
+  assignedTeam,
+  filters,
+  type,
+  page = 1,
+  callback
+) => {
+  try {
+    // Build the initial query
+    const queryData = buildBookingQuery(userId, userType, subadminType, assignedTeam, filters, type, page);
+
+    
+    // Handle special case for SUBADMIN users that need team queries
+    if (queryData.userTypeResult.needsTeamQuery) {
+      const { teamIds, queryType, userId: subadminUserId } = queryData.userTypeResult;
+      
+      if (teamIds.length === 0) {
+        return callback(null, []);
+      }
+
+      const placeholders = teamIds.map(() => "FIND_IN_SET(?, a.fld_team_id)").join(" OR ");
+      const adminQuery = `SELECT id FROM tbl_admin a WHERE ${placeholders}`;
+
+      // Execute team query first
+      db.query(adminQuery, teamIds, (err, adminRows) => {
+        if (err) {
+          return callback(err);
+        }
+
+        const adminIds = adminRows.map((row) => row.id);
+        if (adminIds.length === 0) {
+          return callback(null, []);
+        }
+
+        let finalCondition;
+        let conditionParams;
+
+        if (queryType === "consultant_sub") {
+          // Only fetch bookings for consultants in assigned teams
+          const uidPlaceholders = adminIds.map(() => "?").join(",");
+          finalCondition = ` AND b.fld_consultantid IN (${uidPlaceholders})`;
+          conditionParams = adminIds;
+        } else {
+          // Other SUBADMINs: fetch bookings added by them or their team members
+          const uniqueUserIds = [...new Set([...adminIds, subadminUserId])];
+          const uidPlaceholders = uniqueUserIds.map(() => "?").join(",");
+          finalCondition = ` AND (b.fld_consultantid IN (${uidPlaceholders}) OR b.fld_addedby IN (${uidPlaceholders}))`;
+          conditionParams = [...uniqueUserIds, ...uniqueUserIds];
+        }
+
+        // Add the team-based condition to both queries
+        queryData.sql += finalCondition;
+        queryData.countSql += finalCondition;
+        queryData.params.push(...conditionParams);
+        queryData.countParams.push(...conditionParams);
+
+        // NOW add ORDER BY and LIMIT after all WHERE conditions
+        queryData.sql += ` ORDER BY b.id DESC`;
+        
+        if (queryData.type === "all") {
+          queryData.sql += ` LIMIT ? OFFSET ?`;
+          queryData.params.push(queryData.limit, (page - 1) * queryData.limit);
+        } else {
+          queryData.sql += ` LIMIT 50`;
+        }
+
+        // Execute the final queries
+        executeQueries(queryData, filters, page, callback);
+      });
+    } else {
+      // Execute queries directly for non-team cases
+      executeQueries(queryData, filters, page, callback);
+    }
+  } catch (error) {
+    callback(error);
+  }
+};
+
+// Helper function to execute the final database queries
+const executeQueries = (queryData, filters, page, callback) => {
+  const { sql, countSql, params, countParams, limit, needsPagination } = queryData;
+
+  if (needsPagination) {
+    // Execute count query first for pagination
+    db.query(countSql, countParams, (countErr, countResults) => {
+      if (countErr) {
+        return callback(countErr);
+      }
+
+      const totalRecords = countResults[0].total;
+      const totalPages = Math.ceil(totalRecords / limit);
+
+      // Execute main query
+      db.query(sql, params, (err, results) => {
+        if (err) return callback(err);
+
+        const paginationData = {
+          data: results || [],
+          pagination: {
+            currentPage: page,
+            totalPages,
+            totalRecords,
+            limit,
+            hasNextPage: page < totalPages,
+            hasPreviousPage: page > 1,
+          },
+        };
+
+        if (filters.bookingId) {
+          return callback(null, results.length > 0 ? results[0] : false);
+        } else {
+          return callback(null, paginationData);
+        }
+      });
+    });
+  } else {
+    // Non-paginated query
+    db.query(sql, params, (err, results) => {
+      if (err) return callback(err);
+
+      if (results.length > 0) {
+        if (filters.bookingId) {
+          return callback(null, results[0]);
+        } else {
+          return callback(null, results);
+        }
+      } else {
+        return callback(null, false);
+      }
+    });
+  }
+};
+
+const getBookingByOtpUrl = (bookingId, verifyOtpUrl, callback) => {
+ 
+
+    const query = `
+      SELECT 
+        b.*,
+        a1.fld_client_code AS crm_client_code,
+        a1.fld_name AS crm_name,
+        a1.fld_email AS crm_email,
+        a2.fld_client_code AS consultant_client_code,
+        a2.fld_name AS consultant_name,
+        a2.fld_email AS consultant_email,
+        a3.fld_client_code AS sec_consultant_client_code,
+        a3.fld_name AS sec_consultant_name,
+        a3.fld_email AS sec_consultant_email,
+        u.fld_name AS user_name,
+        u.fld_email AS user_email,
+        u.fld_phone AS user_phone
+      FROM tbl_booking b
+      LEFT JOIN tbl_admin a1 ON b.fld_addedby = a1.id
+      LEFT JOIN tbl_admin a2 ON b.fld_consultantid = a2.id
+      LEFT JOIN tbl_admin a3 ON b.fld_secondary_consultant_id = a3.id
+      LEFT JOIN tbl_user u ON b.fld_userid = u.id
+      WHERE b.id = ? AND b.fld_verify_otp_url = ?
+    `;
+
+    db.query(query, [bookingId, verifyOtpUrl], (err, results) => {
+      
+      callback(err, results);
+    });
+  
+};
+
+const getConsultantTeamBookings = (userId, callback) => {
+
+  const today = moment().tz("Asia/Kolkata").format("YYYY-MM-DD");
+
+
+  const startDate = moment(today).subtract(15, "days").format("YYYY-MM-DD");
+  const endDate = moment(today).add(15, "days").format("YYYY-MM-DD");
+
+  const query = `
+    SELECT 
+      b.id AS booking_id,
+      b.fld_sale_type,
+      b.fld_client_id,
+      b.fld_name AS client_name,
+      b.fld_booking_date,
+      b.fld_booking_slot,
+      u.fld_phone AS client_phone,
+      u.fld_email AS client_email
+    FROM tbl_booking b
+    LEFT JOIN tbl_user u ON b.fld_userid = u.id
+    WHERE b.fld_consultantid = ?
+      AND b.fld_consultant_another_option = 'TEAM'
+      AND b.fld_booking_date BETWEEN ? AND ?
+    ORDER BY b.fld_booking_date DESC
+  `;
+
+ 
+
+    db.query(query, [userId, startDate, endDate], (error, results) => {
+      
+      if (error) return callback(error);
+      callback(null, results || []);
+    });
+  
+};
+
+const updateMiniStatus = (bookingId, field, value, callback) => {
+  const query = `UPDATE tbl_booking SET ${field} = ? WHERE id = ?`;
+  db.query(query, [value, bookingId], (error, result) => {
+    if (error) {
+      console.error("Update query error:", error);
+      return callback(error, null);
+    }
+    callback(null, result);
+  });
+};
+
+// Conditionally set initialMailSent = 1 only when currently NULL or not 1
+const setInitialMailSentIfNeeded = (bookingId, callback) => {
+  const query = `UPDATE tbl_booking SET initialMailSent = 1 WHERE id = ? AND (initialMailSent IS NULL OR initialMailSent != 1)`;
+  db.query(query, [bookingId], (error, result) => {
+    if (error) return callback(error);
+    callback(null, result.affectedRows > 0);
+  });
+};
+
+
+module.exports = {
+  getBookings,
+  getBookingHistory,
+  getPresaleClientDetails,
+  // getPostsaleClientDetails,
+  // getProjectMilestones,
+  checkCallrecording,
+  checkConsultantClientWebsite,
+  checkConsultantCompletedCallNew,
+  checkConsultantCompletedCall,
+  checkPresalesCall,
+  getClientCallsRequestPlanLimitOver,
+  getMeetingId,
+  insertBooking,
+  updateBooking,
+  getConsultantId,
+  insertAddCallRequest,
+  insertExternalCall,
+  insertBookingHistory,
+  insertBookingStatusHistory,
+  getAdmin,
+  getAdminById,
+  insertUser,
+  updateRcCallRequestSts,
+  getPostsaleCompletedCalls,
+  getBookingById,
+  getBookingRowById,
+  deleteBookingById,
+  getAllCrmIds,
+  getBookingData,
+  getExternalCallInfo,
+  getOtherBookingData,
+  updateExternalCallsStatus,
+  getFullBookingData,
+  getExternalCallCountByBookingId,
+  getBookingStatusHistory,
+  getAllClientBookings,
+  getLatestCompletedBooking,
+  getLatestCompletedBookingStatusHistory,
+  getLatestCompletedBookingHistory,
+  checkConflictingBookings,
+  fetchSummaryBookings,
+  getBookingByOtpUrl,
+  getRcCallBookingRequestById,
+  getConsultantTeamBookings,
+
+  updateMiniStatus,
+  setInitialMailSentIfNeeded
+};
